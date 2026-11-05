@@ -1,11 +1,14 @@
 """S9: run each valid edit in its own sandbox and classify strictly."""
 import asyncio
+import logging
 
 from pod.pipeline.baseline import require_tree, validate_items
 from pod.pipeline.context import RunContext
 from pod.schemas import Mutation, MutationResult
 from pod.verify.snapshot import Snapshot
 from pod.verify.test_citations import index_tests
+
+logger = logging.getLogger("pod")
 
 
 def stable_test_nodes(snapshot: Snapshot, runs: list[list[dict[str, str]]]) -> set[str]:
@@ -71,7 +74,8 @@ async def prove_mutations(ctx: RunContext) -> None:
                     outcome = 'killed' if killed_by else 'invalid'
                 else:
                     outcome = 'invalid'
-            except Exception as exc:  # noqa: BLE001 -- isolate untrusted calls
+            except Exception as exc:
+                logger.exception('S9 mutation %s (item %s) failed', mutation.id, mutation.item_id)
                 outcome = 'invalid'
                 detail = f'{type(exc).__name__}: {exc}'[:500]
             evidence = ctx.state.evidence.get(mutation.item_id)
