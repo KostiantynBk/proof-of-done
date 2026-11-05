@@ -1,0 +1,24 @@
+[Unit]
+Description=Proof of Done orchestrator (FastAPI)
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+User=pod
+Group=pod
+WorkingDirectory=/srv/pod/app
+EnvironmentFile=/etc/pod/pod.env
+Environment=POD_DATA_DIR=/srv/pod/data
+Environment=POD_WORK_ROOT=/srv/pod/work
+Environment=POD_SANDBOX_RUNTIME=runsc
+ExecStart=/srv/pod/app/.venv/bin/uvicorn pod.app:app --host 127.0.0.1 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/pod/data /srv/pod/work
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+.venv*/
+.pytest_cache/
+.ruff_cache/
+node_modules/
+frontend/dist/
+data/
+*.sqlite
+*.db
+.env
+.env.*
+!.env.example
+*.log
+# local run data, logs and probes (never commit run artifacts or model outputs)
+data-*/
+data-*.json
+data-*.log
+data-*.txt
+*.sqlite3
+*.sqlite3-*
+.env.txt
+*.egg-info/

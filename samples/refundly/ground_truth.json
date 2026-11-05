@@ -1,0 +1,261 @@
+[
+  {
+    "key": "REQ-refund-cap",
+    "kind": "requirement",
+    "anchor": "A refund may never exceed the captured amount minus refunds already issued.",
+    "expected_verdict": "PROVEN",
+    "why": "The boundary tests protect the remaining capture and equality.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "amount > order.captured - order.refunded",
+        "replace": "amount >= order.captured - order.refunded",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "amount > order.captured - order.refunded",
+        "replace": "amount > order.captured",
+        "expect": "killed"
+      }
+    ]
+  },
+  {
+    "key": "REQ-manager-approval",
+    "kind": "requirement",
+    "anchor": "Refunds requested more than 90 days after the order date require manager approval.",
+    "expected_verdict": "WEAK",
+    "why": "The only age assertion is for 120 days.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": " > timedelta(days=90)",
+        "replace": " >= timedelta(days=90)",
+        "expect": "survived"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "timedelta(days=90)",
+        "replace": "timedelta(days=100)",
+        "expect": "survived"
+      }
+    ]
+  },
+  {
+    "key": "REQ-audit-fields",
+    "kind": "requirement",
+    "anchor": "Every issued refund must create an audit record containing actor, amount, reason and order id.",
+    "expected_verdict": "WEAK",
+    "why": "The existing test counts records but does not check their fields.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "self.audit.record(actor, \"refund_issued\", amount, reason, order.order_id)",
+        "replace": "self.audit.record(\"unknown\", \"refund_issued\", amount, reason, order.order_id)",
+        "expect": "survived"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "self.audit.record(actor, \"refund_issued\", amount, reason, order.order_id)",
+        "replace": "self.audit.record(actor, \"refund_issued\", amount, \"\", order.order_id)",
+        "expect": "survived"
+      }
+    ]
+  },
+  {
+    "key": "REQ-original-method",
+    "kind": "requirement",
+    "anchor": "requests to a different method are rejected",
+    "expected_verdict": "UNTESTED",
+    "why": "No test sends a mismatched payment method.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "if destination != order.payment_method:",
+        "replace": "if False:",
+        "expect": "survived"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "destination != order.payment_method",
+        "replace": "destination != destination",
+        "expect": "survived"
+      }
+    ]
+  },
+  {
+    "key": "REQ-gift-credit",
+    "kind": "requirement",
+    "anchor": "Orders paid by gift card are refunded only as store credit.",
+    "expected_verdict": "VIOLATED",
+    "why": "The service currently directs gift card refunds back to gift cards.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "destination != order.payment_method",
+        "replace": "False",
+        "expect": "survived"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "destination != order.payment_method",
+        "replace": "destination != destination",
+        "expect": "survived"
+      }
+    ],
+    "oracle_test": "from decimal import Decimal\nfrom refundly.orders import Order\nfrom refundly.audit import AuditLog\nfrom refundly.gateway import FakeGateway\nfrom refundly.refunds import RefundService\nfrom refundly import clock\n\ndef test_gift_card_refunds_to_store_credit():\n    order = Order(\"gift\", Decimal(\"10\"), \"gift_card\", clock.now())\n    gateway = FakeGateway()\n    result = RefundService(gateway, AuditLog()).issue(order, \"gift-1\", Decimal(\"1\"), \"alice\", \"return\")\n    assert result.method == \"store_credit\"\n    assert gateway.transfers[0][2] == \"store_credit\"\n"
+  },
+  {
+    "key": "REQ-idempotency",
+    "kind": "requirement",
+    "anchor": "the same request_id processed twice results in exactly one refund.",
+    "expected_verdict": "PROVEN",
+    "why": "A repeated request is checked for both identity and transfer count.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "request_id in self.processed",
+        "replace": "False",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "self.processed[request_id] = result",
+        "replace": "pass",
+        "expect": "killed"
+      }
+    ]
+  },
+  {
+    "key": "REQ-retries",
+    "kind": "requirement",
+    "anchor": "after the third failure the refund is marked FAILED and no money moves.",
+    "expected_verdict": "PROVEN",
+    "why": "Retry tests check the attempt count, failure state, and lack of transfers.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "attempts += 1",
+        "replace": "attempts += 0",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "if attempts == 3:",
+        "replace": "if attempts == 2:",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "while attempts < 3:",
+        "replace": "while attempts < 2:",
+        "expect": "killed"
+      }
+    ]
+  },
+  {
+    "key": "REQ-round-down",
+    "kind": "requirement",
+    "anchor": "Partial refund amounts are rounded down to the cent.",
+    "expected_verdict": "PROVEN",
+    "why": "The fractional-cent test checks the result, accounting, and gateway amount.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/money.py",
+        "search": "value.quantize(CENT, rounding=ROUND_DOWN)",
+        "replace": "value.quantize(CENT)",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/money.py",
+        "search": "value.quantize(CENT, rounding=ROUND_DOWN)",
+        "replace": "value.quantize(Decimal('0.1'), rounding=ROUND_DOWN)",
+        "expect": "killed"
+      }
+    ]
+  },
+  {
+    "key": "RULE-money",
+    "kind": "rule",
+    "anchor": "Use Decimal and money helpers for amounts, never float.",
+    "expected_verdict": "PROVEN",
+    "why": "Float inputs are rejected and fractional-cent arithmetic stays exact.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "cents(amount)",
+        "replace": "cents(float(amount))",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "cents(amount)",
+        "replace": "cents(Decimal(float(amount)))",
+        "expect": "killed"
+      }
+    ]
+  },
+  {
+    "key": "RULE-clock",
+    "kind": "rule",
+    "anchor": "Use clock.now() instead of datetime.now() for all current timestamps.",
+    "expected_verdict": "WEAK",
+    "why": "Tests patch the clock but do not assert that calls go through it.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "clock.now()",
+        "replace": "datetime.now(UTC)",
+        "expect": "survived"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "clock.now()",
+        "replace": "datetime.now(UTC) + timedelta()",
+        "expect": "survived"
+      }
+    ]
+  },
+  {
+    "key": "RULE-audit",
+    "kind": "rule",
+    "anchor": "Write audit events with audit.record(), not logger.info or print.",
+    "expected_verdict": "PROVEN",
+    "why": "The record-existence test kills both seeded replacements of the audit call, but does not exclude extra logs.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/refunds.py",
+        "search": "self.audit.record(actor, \"refund_issued\", amount, reason, order.order_id)",
+        "replace": "logger.info(\"refund issued\")",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/refunds.py",
+        "search": "self.audit.record(actor, \"refund_issued\", amount, reason, order.order_id)",
+        "replace": "print(actor)",
+        "expect": "killed"
+      }
+    ]
+  },
+  {
+    "key": "RULE-errors",
+    "kind": "rule",
+    "anchor": "Raise errors from refundly.errors instead of bare ValueError or Exception.",
+    "expected_verdict": "PROVEN",
+    "why": "Tests require domain errors for invalid amounts and excess refunds.",
+    "oracle_mutations": [
+      {
+        "file": "refundly/money.py",
+        "search": "raise InvalidAmount(\"amount must be Decimal\")",
+        "replace": "raise ValueError(\"amount must be Decimal\")",
+        "expect": "killed"
+      },
+      {
+        "file": "refundly/money.py",
+        "search": "raise InvalidAmount(\"amount must be finite and non-negative\")",
+        "replace": "raise ValueError(\"amount must be finite and non-negative\")",
+        "expect": "killed"
+      }
+    ]
+  }
+]

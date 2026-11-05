@@ -1,0 +1,3 @@
+CI run 1042
+FAILED test_age_boundary: datetime.now() crossed midnight while the fixture expected a fixed time.
+Rerun passed. Inject clock.now() to avoid wall clock dependence.

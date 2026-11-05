@@ -1,0 +1,432 @@
+[
+  {
+    "id": "review-001",
+    "pr": 101,
+    "pr_title": "Refund workflow change 101",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 21,
+    "body": "Use Decimal and money helpers for amounts, never float.",
+    "created_at": "2026-10-02T10:00:00Z"
+  },
+  {
+    "id": "review-002",
+    "pr": 104,
+    "pr_title": "Refund workflow change 104",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 22,
+    "body": "Please use the money helpers and Decimal rather than float for payment amounts.",
+    "created_at": "2026-10-03T10:00:00Z"
+  },
+  {
+    "id": "review-003",
+    "pr": 109,
+    "pr_title": "Refund workflow change 109",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 23,
+    "body": "Convert amounts with Decimal and money helpers, not float arithmetic.",
+    "created_at": "2026-10-04T10:00:00Z"
+  },
+  {
+    "id": "review-004",
+    "pr": 102,
+    "pr_title": "Refund workflow change 102",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 24,
+    "body": "Use clock.now() instead of datetime.now() for all current timestamps.",
+    "created_at": "2026-10-05T10:00:00Z"
+  },
+  {
+    "id": "review-005",
+    "pr": 108,
+    "pr_title": "Refund workflow change 108",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 25,
+    "body": "Please call clock.now() rather than datetime.utcnow() so time is injectable.",
+    "created_at": "2026-10-06T10:00:00Z"
+  },
+  {
+    "id": "review-006",
+    "pr": 103,
+    "pr_title": "Refund workflow change 103",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 26,
+    "body": "Write audit events with audit.record(), not logger.info or print.",
+    "created_at": "2026-10-07T10:00:00Z"
+  },
+  {
+    "id": "review-007",
+    "pr": 110,
+    "pr_title": "Refund workflow change 110",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 27,
+    "body": "Please use audit.record() for audit events rather than printing them.",
+    "created_at": "2026-10-08T10:00:00Z"
+  },
+  {
+    "id": "review-008",
+    "pr": 105,
+    "pr_title": "Refund workflow change 105",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 28,
+    "body": "Raise errors from refundly.errors instead of bare ValueError or Exception.",
+    "created_at": "2026-10-09T10:00:00Z"
+  },
+  {
+    "id": "review-009",
+    "pr": 111,
+    "pr_title": "Refund workflow change 111",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 29,
+    "body": "Use the refundly.errors hierarchy, not a bare ValueError, for rejections.",
+    "created_at": "2026-10-10T10:00:00Z"
+  },
+  {
+    "id": "review-010",
+    "pr": 112,
+    "pr_title": "Refund workflow change 112",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 30,
+    "body": "I prefer a blue dashboard header for the admin view.",
+    "created_at": "2026-10-11T10:00:00Z"
+  },
+  {
+    "id": "review-011",
+    "pr": 112,
+    "pr_title": "Refund workflow change 112",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 31,
+    "body": "Could the admin header be blue rather than gray?",
+    "created_at": "2026-10-12T10:00:00Z"
+  },
+  {
+    "id": "review-012",
+    "pr": 200,
+    "pr_title": "Refund workflow change 200",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 32,
+    "body": "The variable name could be clearer here.",
+    "created_at": "2026-10-13T10:00:00Z"
+  },
+  {
+    "id": "review-013",
+    "pr": 201,
+    "pr_title": "Refund workflow change 201",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 33,
+    "body": "There is a typo in this docstring.",
+    "created_at": "2026-10-14T10:00:00Z"
+  },
+  {
+    "id": "review-014",
+    "pr": 202,
+    "pr_title": "Refund workflow change 202",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 34,
+    "body": "LGTM",
+    "created_at": "2026-10-15T10:00:00Z"
+  },
+  {
+    "id": "review-015",
+    "pr": 203,
+    "pr_title": "Refund workflow change 203",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 35,
+    "body": "What happens if the order is archived?",
+    "created_at": "2026-10-16T10:00:00Z"
+  },
+  {
+    "id": "review-016",
+    "pr": 204,
+    "pr_title": "Refund workflow change 204",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 36,
+    "body": "Could this heading be shorter?",
+    "created_at": "2026-10-17T10:00:00Z"
+  },
+  {
+    "id": "review-017",
+    "pr": 205,
+    "pr_title": "Refund workflow change 205",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 37,
+    "body": "This comma looks misplaced.",
+    "created_at": "2026-10-18T10:00:00Z"
+  },
+  {
+    "id": "review-018",
+    "pr": 206,
+    "pr_title": "Refund workflow change 206",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 38,
+    "body": "Can you explain this example?",
+    "created_at": "2026-10-19T10:00:00Z"
+  },
+  {
+    "id": "review-019",
+    "pr": 207,
+    "pr_title": "Refund workflow change 207",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 39,
+    "body": "The diagram has a missing arrow.",
+    "created_at": "2026-10-20T10:00:00Z"
+  },
+  {
+    "id": "review-020",
+    "pr": 208,
+    "pr_title": "Refund workflow change 208",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 40,
+    "body": "Please rename this local counter.",
+    "created_at": "2026-10-21T10:00:00Z"
+  },
+  {
+    "id": "review-021",
+    "pr": 209,
+    "pr_title": "Refund workflow change 209",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 41,
+    "body": "Thanks for the helpful example.",
+    "created_at": "2026-10-22T10:00:00Z"
+  },
+  {
+    "id": "review-022",
+    "pr": 210,
+    "pr_title": "Refund workflow change 210",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 42,
+    "body": "Is the example currency EUR?",
+    "created_at": "2026-10-23T10:00:00Z"
+  },
+  {
+    "id": "review-023",
+    "pr": 211,
+    "pr_title": "Refund workflow change 211",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 43,
+    "body": "Maybe use a smaller icon here.",
+    "created_at": "2026-10-24T10:00:00Z"
+  },
+  {
+    "id": "review-024",
+    "pr": 212,
+    "pr_title": "Refund workflow change 212",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 44,
+    "body": "The list has one extra blank line.",
+    "created_at": "2026-10-25T10:00:00Z"
+  },
+  {
+    "id": "review-025",
+    "pr": 213,
+    "pr_title": "Refund workflow change 213",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 45,
+    "body": "Does this link need an anchor?",
+    "created_at": "2026-10-26T10:00:00Z"
+  },
+  {
+    "id": "review-026",
+    "pr": 214,
+    "pr_title": "Refund workflow change 214",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 46,
+    "body": "Consider a more descriptive title.",
+    "created_at": "2026-10-27T10:00:00Z"
+  },
+  {
+    "id": "review-027",
+    "pr": 215,
+    "pr_title": "Refund workflow change 215",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 47,
+    "body": "This section seems out of date.",
+    "created_at": "2026-10-28T10:00:00Z"
+  },
+  {
+    "id": "review-028",
+    "pr": 216,
+    "pr_title": "Refund workflow change 216",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 48,
+    "body": "Would a table help this paragraph?",
+    "created_at": "2026-10-01T10:00:00Z"
+  },
+  {
+    "id": "review-029",
+    "pr": 217,
+    "pr_title": "Refund workflow change 217",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 49,
+    "body": "The screenshot is slightly blurry.",
+    "created_at": "2026-10-02T10:00:00Z"
+  },
+  {
+    "id": "review-030",
+    "pr": 218,
+    "pr_title": "Refund workflow change 218",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 50,
+    "body": "One example seems duplicated.",
+    "created_at": "2026-10-03T10:00:00Z"
+  },
+  {
+    "id": "review-031",
+    "pr": 219,
+    "pr_title": "Refund workflow change 219",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 51,
+    "body": "Nice explanation of the migration.",
+    "created_at": "2026-10-04T10:00:00Z"
+  },
+  {
+    "id": "review-032",
+    "pr": 220,
+    "pr_title": "Refund workflow change 220",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 52,
+    "body": "Could you expand this abbreviation?",
+    "created_at": "2026-10-05T10:00:00Z"
+  },
+  {
+    "id": "review-033",
+    "pr": 221,
+    "pr_title": "Refund workflow change 221",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 53,
+    "body": "Should this include a date?",
+    "created_at": "2026-10-06T10:00:00Z"
+  },
+  {
+    "id": "review-034",
+    "pr": 222,
+    "pr_title": "Refund workflow change 222",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 54,
+    "body": "The diagram label is misaligned.",
+    "created_at": "2026-10-07T10:00:00Z"
+  },
+  {
+    "id": "review-035",
+    "pr": 223,
+    "pr_title": "Refund workflow change 223",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 55,
+    "body": "Perhaps mention the optional field.",
+    "created_at": "2026-10-08T10:00:00Z"
+  },
+  {
+    "id": "review-036",
+    "pr": 224,
+    "pr_title": "Refund workflow change 224",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 56,
+    "body": "I wonder whether this can be shorter.",
+    "created_at": "2026-10-09T10:00:00Z"
+  },
+  {
+    "id": "review-037",
+    "pr": 225,
+    "pr_title": "Refund workflow change 225",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 57,
+    "body": "A spelling correction is needed.",
+    "created_at": "2026-10-10T10:00:00Z"
+  },
+  {
+    "id": "review-038",
+    "pr": 226,
+    "pr_title": "Refund workflow change 226",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 58,
+    "body": "The bullet indentation looks unusual.",
+    "created_at": "2026-10-11T10:00:00Z"
+  },
+  {
+    "id": "review-039",
+    "pr": 227,
+    "pr_title": "Refund workflow change 227",
+    "author": "reviewer-5",
+    "path": "refundly/refunds.py",
+    "line": 59,
+    "body": "What does this abbreviation mean?",
+    "created_at": "2026-10-12T10:00:00Z"
+  },
+  {
+    "id": "review-040",
+    "pr": 228,
+    "pr_title": "Refund workflow change 228",
+    "author": "reviewer-1",
+    "path": "refundly/refunds.py",
+    "line": 60,
+    "body": "This example could use a caption.",
+    "created_at": "2026-10-13T10:00:00Z"
+  },
+  {
+    "id": "review-041",
+    "pr": 229,
+    "pr_title": "Refund workflow change 229",
+    "author": "reviewer-2",
+    "path": "refundly/refunds.py",
+    "line": 61,
+    "body": "Is this link still relevant?",
+    "created_at": "2026-10-14T10:00:00Z"
+  },
+  {
+    "id": "review-042",
+    "pr": 230,
+    "pr_title": "Refund workflow change 230",
+    "author": "reviewer-3",
+    "path": "refundly/refunds.py",
+    "line": 62,
+    "body": "The text wraps oddly here.",
+    "created_at": "2026-10-15T10:00:00Z"
+  },
+  {
+    "id": "review-043",
+    "pr": 231,
+    "pr_title": "Refund workflow change 231",
+    "author": "reviewer-4",
+    "path": "refundly/refunds.py",
+    "line": 63,
+    "body": "Thank you for checking this.",
+    "created_at": "2026-10-16T10:00:00Z"
+  }
+]

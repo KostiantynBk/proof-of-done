@@ -1,0 +1,67 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1409 >>
+stream
+BT /F1 10 Tf 50 750 Td 14 TL
+(Refundly Refund Policy & Service Requirements v2.0) Tj T*
+() Tj T*
+(The November 2026 policy update clarifies refund controls following an internal payment) Tj T*
+(review. Amounts are denominated in the order currency. A refund is issued only when the) Tj T*
+(gateway accepts it.) Tj T*
+() Tj T*
+(Requirement R-A) Tj T*
+(A refund may never exceed the captured amount minus refunds already issued.) Tj T*
+() Tj T*
+(Requirement R-B) Tj T*
+(Refunds requested more than 90 days after the order date require manager approval.) Tj T*
+() Tj T*
+(Requirement R-C) Tj T*
+(Every issued refund must create an audit record containing actor, amount, reason and) Tj T*
+(order id.) Tj T*
+() Tj T*
+(Requirement R-D) Tj T*
+(A refund must be returned to the original payment method; requests to a different method) Tj T*
+(are rejected, except for the gift card policy below.) Tj T*
+() Tj T*
+(Requirement R-E) Tj T*
+(Orders paid by gift card are refunded only as store credit.) Tj T*
+() Tj T*
+(Requirement R-F) Tj T*
+(Refund requests are idempotent: the same request_id processed twice results in exactly) Tj T*
+(one refund.) Tj T*
+() Tj T*
+(Requirement R-G) Tj T*
+(Gateway refund calls are retried at most 3 times; after the third failure the refund is) Tj T*
+(marked FAILED and no money moves.) Tj T*
+() Tj T*
+(Requirement R-H) Tj T*
+(Partial refund amounts are rounded down to the cent.) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000317 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1778
+%%EOF

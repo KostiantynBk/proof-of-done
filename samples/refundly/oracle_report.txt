@@ -1,0 +1,29 @@
+BASELINE survived: passed
+PASS REQ-refund-cap #1: expected=killed observed=killed tests/test_refunds.py::test_cap_allows_exact_remaining
+PASS REQ-refund-cap #2: expected=killed observed=killed tests/test_refunds.py::test_cap_rejects_one_cent_over_remaining
+PASS REQ-manager-approval #1: expected=survived observed=survived passed
+PASS REQ-manager-approval #2: expected=survived observed=survived passed
+PASS REQ-audit-fields #1: expected=survived observed=survived passed
+PASS REQ-audit-fields #2: expected=survived observed=survived passed
+PASS REQ-original-method #1: expected=survived observed=survived passed
+PASS REQ-original-method #2: expected=survived observed=survived passed
+PASS REQ-gift-credit #1: expected=survived observed=survived passed
+PASS REQ-gift-credit #2: expected=survived observed=survived passed
+PASS REQ-gift-credit oracle test: killed tests/test_oracle_gap.py::test_gift_card_refunds_to_store_credit
+PASS REQ-gift-credit reference fix: survived passed
+PASS REQ-idempotency #1: expected=killed observed=killed tests/test_refunds.py::test_idempotency_returns_original_without_extra_transfer
+PASS REQ-idempotency #2: expected=killed observed=killed tests/test_refunds.py::test_idempotency_returns_original_without_extra_transfer
+PASS REQ-retries #1: expected=killed observed=killed tests/test_refunds.py::test_gateway_failure_stops_after_three_attempts (named timeout failure)
+PASS REQ-retries #2: expected=killed observed=killed tests/test_refunds.py::test_gateway_failure_stops_after_three_attempts
+PASS REQ-retries #3: expected=killed observed=killed tests/test_refunds.py::test_gateway_failure_stops_after_three_attempts
+PASS REQ-round-down #1: expected=killed observed=killed tests/test_refunds.py::test_partial_amount_rounds_down
+PASS REQ-round-down #2: expected=killed observed=killed tests/test_refunds.py::test_cap_rejects_one_cent_over_remaining
+PASS RULE-money #1: expected=killed observed=killed tests/test_refunds.py::test_cap_allows_exact_remaining
+PASS RULE-money #2: expected=killed observed=killed tests/test_refunds.py::test_cap_rejects_one_cent_over_remaining
+PASS RULE-clock #1: expected=survived observed=survived passed
+PASS RULE-clock #2: expected=survived observed=survived passed
+PASS RULE-audit #1: expected=killed observed=killed tests/test_refunds.py::test_audit_record_exists
+PASS RULE-audit #2: expected=killed observed=killed tests/test_refunds.py::test_audit_record_exists
+PASS RULE-errors #1: expected=killed observed=killed tests/test_refunds.py::test_float_amount_rejected_with_domain_error
+PASS RULE-errors #2: expected=killed observed=killed tests/test_refunds.py::test_invalid_amount_rejected_with_domain_error
+RESULT PASS mismatches=0
