@@ -38,6 +38,13 @@ Operational observations, not product-evaluation results. No containment or qual
 - Added opt-in, metadata-only diagnostic sink, not wired to public service/API. No model settings, token defaults, validators or runtime flags changed. Review found no blocker/high/medium; independent local tests **241 passed, 4 skipped**, Ruff passed. Further provider-supported reasoning-control experiments are separately gated.
 - Evidence: `hackathon-entry/tickets/T10-artifacts/`, `T11-artifacts/`, reports T10/T11 and T11-diagnostics review; navigator session `261107-alert-heron/data/step-d-*`.
 
+## 2026-11-07 — Step D reasoning-control experiment
+
+- Official Vultr documentation and live model catalog support per-request reasoning effort and reasoning-token budget controls. Six bounded role probes requested low effort / 1,024 reasoning tokens within the unchanged 4,096 total cap; all six returned schema-valid output initially. Reported usage: 27,239 tokens. This is a small diagnostic sample, not a reliability benchmark.
+- Limited static checks found exact code snippets in the two auditor samples and unique find text in the two saboteur samples. Neither proves full semantic correctness. Both testwriter samples returned wrong item IDs and remain rejected by the unchanged guard gate; no test was executed or approved from these probes.
+- MiniMax reported 1,037 reasoning tokens despite requesting 1,024. The setting is not claimed as an observed hard cap.
+- Added opt-in per-role configuration; defaults and model families unchanged. Reviewer found no actionable issue; navigator independently reran **257 passed, 4 skipped**, Ruff passed. Controls have not yet been deployed or validated in a complete tuned audit. Evidence: T12 report/artifacts and T12-reasoning review.
+
 ## Current gates
 
 - Step B: server bootstrap, deployment, valid TLS and health verification — verified; low documentation follow-up fixed.

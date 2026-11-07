@@ -15,6 +15,24 @@ def test_defaults_and_environment(monkeypatch, tmp_path):
     assert settings.runtime == "runsc"
 
 
+def test_role_reasoning_environment(monkeypatch):
+    monkeypatch.setenv('POD_REASONING_EFFORT_AUDITOR', 'low')
+    monkeypatch.setenv('POD_REASONING_MAX_TOKENS_AUDITOR', '1024')
+    settings = Settings()
+    assert settings.reasoning['auditor'] == {'effort': 'low', 'max_tokens': 1024}
+    assert 'saboteur' not in settings.reasoning
+    monkeypatch.setenv('POD_REASONING_EFFORT_AUDITOR', 'unknown')
+    with pytest.raises(ValueError, match='reasoning'):
+        Settings()
+    monkeypatch.setenv('POD_REASONING_EFFORT_AUDITOR', 'low')
+    for invalid in ('0', '-1', '1.5', '', 'true'):
+        monkeypatch.setenv('POD_REASONING_MAX_TOKENS_AUDITOR', invalid)
+        with pytest.raises(ValueError, match='reasoning'):
+            Settings()
+    with pytest.raises(ValueError, match='reasoning'):
+        Settings(reasoning={'not-a-role': {'effort': 'low'}})
+
+
 def test_sandbox_identity_validation(monkeypatch):
     monkeypatch.delenv("POD_SANDBOX_UID", raising=False)
     monkeypatch.delenv("POD_SANDBOX_GID", raising=False)

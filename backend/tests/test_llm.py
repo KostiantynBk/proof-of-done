@@ -5,7 +5,8 @@ from types import SimpleNamespace
 import httpx
 import pytest
 from pod import llm
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, field_validator
+from pydantic_core import PydanticCustomError
 
 
 class Answer(BaseModel):
@@ -35,6 +36,70 @@ def run_with(handler, operation, config=None):
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
             return await operation(llm.VultrLLM(config or settings(), client))
     return asyncio.run(run())
+
+
+def test_role_reasoning_controls_apply_on_repair_and_preserve_budget():
+    requests = []
+
+    def handler(request):
+        requests.append(json.loads(request.content))
+        return reply('{"number": "bad"}' if len(requests) == 1 else '{"number": 9}')
+
+    config = settings(reasoning={'auditor': {'effort': 'low', 'max_tokens': 4}})
+    result = run_with(handler, lambda c: c.chat('auditor', [], Answer, max_tokens=10), config)
+    assert result.value.number == 9 and result.record.attempts == 2
+    assert [r['reasoning'] for r in requests] == [{'effort': 'low', 'max_tokens': 4}] * 2
+    assert all(r['max_tokens'] == 10 for r in requests)
+    assert llm._budget.used == 10
+
+
+def test_reasoning_absent_by_default_and_other_role_not_affected():
+    requests = []
+    def handler(request):
+        requests.append(json.loads(request.content))
+        return reply('{"number":1}')
+    config = settings(reasoning={'saboteur': {'effort': 'low', 'max_tokens': 4}})
+    run_with(handler, lambda c: c.chat('auditor', [], Answer, max_tokens=10), config)
+    assert 'reasoning' not in requests[0]
+
+
+@pytest.mark.parametrize('control', [
+    {}, {'effort': 'bogus'}, {'effort': None}, {'max_tokens': 0}, {'max_tokens': True},
+    {'max_tokens': '1'}, {'max_tokens': 10}, {'max_tokens': 11}, {'extra': 1},
+])
+def test_invalid_reasoning_rejected_before_request(control):
+    calls = []
+    def handler(request):
+        calls.append(request)
+        return reply('{"number":1}')
+    with pytest.raises(ValueError, match='reasoning'):
+        run_with(handler, lambda c: c.chat('auditor', [], Answer, max_tokens=10),
+                 settings(reasoning={'auditor': control}))
+    assert not calls
+
+
+def test_reasoning_rejection_does_not_silently_strip_control():
+    requests = []
+    def handler(request):
+        requests.append(json.loads(request.content))
+        return httpx.Response(400, json={'error': 'unsupported reasoning option'})
+    with pytest.raises(llm.LLMError, match='HTTP 400'):
+        run_with(handler, lambda c: c.chat('auditor', [], Answer, max_tokens=10),
+                 settings(reasoning={'auditor': {'effort': 'low', 'max_tokens': 4}}))
+    assert len(requests) == 1 and requests[0]['reasoning']['max_tokens'] == 4
+
+
+def test_reasoning_survives_response_format_fallback():
+    requests = []
+    def handler(request):
+        requests.append(json.loads(request.content))
+        if len(requests) == 1:
+            return httpx.Response(400, json={'error': 'response_format not supported'})
+        return reply('{"number":1}')
+    run_with(handler, lambda c: c.chat('auditor', [], Answer, max_tokens=10),
+             settings(reasoning={'auditor': {'effort': 'low', 'max_tokens': 4}}))
+    assert len(requests) == 2
+    assert all(r['reasoning'] == {'effort': 'low', 'max_tokens': 4} for r in requests)
 
 
 def test_fallback_repair_and_per_model_cache():
@@ -129,6 +194,51 @@ def test_diagnostic_location_masks_untrusted_fields_and_inputs():
         result = llm._validation_locations(exc, StrictAnswer.model_json_schema())
     assert result == [{'loc': ['<field>'], 'type': 'extra_forbidden'}]
     assert 'PRIVATE-DATA-EXAMPLE' not in str(result) and 'test-secret' not in str(result)
+
+
+def test_diagnostic_bounds_unknown_types_and_index_masking():
+    errors = [{'type': 'int_parsing', 'loc': ('number', 5, 'private') + ('number',) * 15, 'input': 'secret'}
+              for _ in range(25)]
+    exc = ValidationError.from_exception_data('Answer', errors)
+    result = llm._validation_locations(exc, Answer.model_json_schema())
+    assert len(result) == 20 and all(len(x['loc']) == 12 for x in result)
+    assert result[0]['loc'][:3] == ['number', '<index>', '<field>']
+    assert 'private' not in str(result) and 'secret' not in str(result)
+
+    class Custom(BaseModel):
+        number: int
+
+        @field_validator('number')
+        @classmethod
+        def reject(cls, value):
+            raise PydanticCustomError('PRIVATE_TYPE', 'hidden {reason}', {'reason': 'secret'})
+
+    with pytest.raises(ValidationError) as custom:
+        Custom(number=1)
+    assert llm._validation_locations(custom.value, Custom.model_json_schema()) == [
+        {'loc': ['number'], 'type': 'unknown'}]
+
+
+def test_empty_length_unknown_finish_and_throwing_sink_still_repairs():
+    requests, seen = [], []
+    def handler(request):
+        requests.append(request)
+        finish = 'length' if len(requests) == 1 else 'PRIVATE_FINISH'
+        return httpx.Response(200, json={'choices': [{'message': {'content': ''}, 'finish_reason': finish}],
+                                         'usage': {'prompt_tokens': 3, 'completion_tokens': 2}})
+    def sink(data):
+        seen.append(data)
+        raise RuntimeError('test-secret')
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            with pytest.raises(llm.LLMError, match='after repair') as error:
+                await llm.VultrLLM(settings(), client, diagnostic_sink=sink).chat('auditor', [], Answer)
+            assert 'test-secret' not in str(error.value)
+    asyncio.run(run())
+    assert len(requests) == 2 and llm._budget.used == 10
+    assert [x['finish_reason'] for x in seen] == ['length', 'other']
+    assert all(x['response_length'] == 0 and x['validation_errors'][0]['type'] == 'json_invalid' for x in seen)
+    assert 'PRIVATE_FINISH' not in str(seen)
 
 
 def test_repair_only_once():

@@ -14,6 +14,23 @@ DEFAULT_MODELS = {
 }
 
 
+def _reasoning_settings() -> dict[str, dict[str, str | int]]:
+    result: dict[str, dict[str, str | int]] = {}
+    for role in DEFAULT_MODELS:
+        effort = os.getenv(f'POD_REASONING_EFFORT_{role.upper()}')
+        budget = os.getenv(f'POD_REASONING_MAX_TOKENS_{role.upper()}')
+        if effort is not None or budget is not None:
+            options: dict[str, str | int] = {}
+            if effort is not None:
+                options['effort'] = effort
+            if budget is not None:
+                if not budget.isascii() or not budget.isdigit():
+                    raise ValueError('reasoning max_tokens must be a positive integer')
+                options['max_tokens'] = int(budget)
+            result[role] = options
+    return result
+
+
 @dataclass
 class Settings:
     data_dir: Path = field(default_factory=lambda: Path(os.getenv("POD_DATA_DIR", "./data")))
@@ -33,6 +50,7 @@ class Settings:
     inference_base_url: str = field(default_factory=lambda: os.getenv("VULTR_INFERENCE_BASE_URL", "https://api.vultrinference.com/v1"))
     inference_api_key: str = field(default_factory=lambda: os.getenv("VULTR_INFERENCE_API_KEY", ""), repr=False)
     models: dict[str, str] = field(default_factory=lambda: {role: os.getenv(f"POD_MODEL_{role.upper()}", model) for role, model in DEFAULT_MODELS.items()})
+    reasoning: dict[str, dict[str, str | int]] = field(default_factory=_reasoning_settings)
     daily_token_budget: int = field(default_factory=lambda: int(os.getenv("POD_DAILY_TOKEN_BUDGET", "3000000")))
     fake_llm: bool = field(default_factory=lambda: os.getenv("POD_FAKE_LLM", "0") == "1")
 
@@ -46,5 +64,10 @@ class Settings:
             self.require_capped_workroot = raw == "1"
         if not (1 <= self.sandbox_uid <= 2147483647 and 1 <= self.sandbox_gid <= 2147483647):
             raise ValueError("sandbox UID and GID must be positive non-root IDs")
+        from pod.llm import validate_reasoning
+        for role, options in self.reasoning.items():
+            if role not in self.models:
+                raise ValueError('reasoning role must be configured')
+            validate_reasoning(options)
         if self.sandbox_concurrency < 1:
             raise ValueError("sandbox concurrency must be positive")

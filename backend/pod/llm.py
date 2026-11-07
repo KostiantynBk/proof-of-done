@@ -134,6 +134,22 @@ def _extract_json(text: str) -> str:
     return text[start:]
 
 
+def validate_reasoning(options: Any, total_tokens: int | None = None) -> dict[str, Any]:
+    """Validate opt-in provider controls; never infer provider support for a model."""
+    if not isinstance(options, dict) or not options or set(options) - {'effort', 'max_tokens'}:
+        raise ValueError('reasoning settings must contain effort and/or max_tokens')
+    effort = options.get('effort')
+    if 'effort' in options and effort not in ('none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+        raise ValueError('invalid reasoning effort')
+    if 'max_tokens' in options:
+        limit = options['max_tokens']
+        if type(limit) is not int or limit <= 0:
+            raise ValueError('reasoning max_tokens must be a positive integer')
+        if total_tokens is not None and limit >= total_tokens:
+            raise ValueError('reasoning max_tokens must be less than total max_tokens')
+    return dict(options)
+
+
 def _safe_identifier(value: str, key: str) -> str:
     return value if key not in value and re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', value) else '<redacted>'
 
@@ -192,6 +208,8 @@ class VultrLLM:
         if max_tokens <= 0:
             raise ValueError("max_tokens must be positive")
         model = self.settings.models[role]
+        controls = getattr(self.settings, 'reasoning', {}).get(role)
+        reasoning_options = validate_reasoning(controls, max_tokens) if controls is not None else None
         strategy = self._strategies.get(model, "json_schema") if response_model else "text"
         initial_messages = [dict(message) for message in messages]
         working_messages = list(initial_messages)
@@ -211,6 +229,8 @@ class VultrLLM:
                     )})
                 payload: dict[str, Any] = {"model": model, "messages": effective,
                                            "temperature": temperature, "max_tokens": max_tokens}
+                if reasoning_options is not None:
+                    payload['reasoning'] = dict(reasoning_options)
                 if strategy == "json_schema":
                     payload["response_format"] = {"type": "json_schema", "json_schema": {
                         "name": response_model.__name__, "schema": schema, "strict": True}}
