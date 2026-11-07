@@ -45,6 +45,12 @@ Operational observations, not product-evaluation results. No containment or qual
 - MiniMax reported 1,037 reasoning tokens despite requesting 1,024. The setting is not claimed as an observed hard cap.
 - Added opt-in per-role configuration; defaults and model families unchanged. Reviewer found no actionable issue; navigator independently reran **257 passed, 4 skipped**, Ruff passed. Controls have not yet been deployed or validated in a complete tuned audit. Evidence: T12 report/artifacts and T12-reasoning review.
 
+## 2026-11-07 — Step D guard identity contract
+
+- Guard prompt now explicitly requires the exact canonical item ID and filename. A reviewer found that model-produced IDs needed validation before appearing in the trusted system instruction; this was fixed with kind-specific ASCII numeric ID rejection before prompt construction. No ID rewriting or proof-gate relaxation.
+- Four bounded probes through the actual Settings/client reasoning path returned matching IDs, filenames and parseable Python. These are static checks, not passing guards or mutation kills; provider-reported usage was 19,536 tokens. No generated test was approved from a probe.
+- Reviewer recheck found no remaining issue. Independent backend suite: **277 passed, 4 skipped**, Ruff passed. Next gate is a complete deployed real run with the experimental role controls, not another unbounded probe loop.
+
 ## Current gates
 
 - Step B: server bootstrap, deployment, valid TLS and health verification — verified; low documentation follow-up fixed.
