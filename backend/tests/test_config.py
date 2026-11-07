@@ -1,3 +1,4 @@
+import pytest
 from pod.config import Settings
 
 
@@ -12,6 +13,18 @@ def test_defaults_and_environment(monkeypatch, tmp_path):
     assert settings.models["saboteur"] == "minimax-m3.1-flash"
     assert "placeholder" not in repr(settings)
     assert settings.runtime == "runsc"
+
+
+def test_sandbox_identity_validation(monkeypatch):
+    monkeypatch.delenv("POD_SANDBOX_UID", raising=False)
+    monkeypatch.delenv("POD_SANDBOX_GID", raising=False)
+    assert (Settings().sandbox_uid, Settings().sandbox_gid) == (1000, 1000)
+    monkeypatch.setenv("POD_SANDBOX_UID", "1001")
+    monkeypatch.setenv("POD_SANDBOX_GID", "1002")
+    assert (Settings().sandbox_uid, Settings().sandbox_gid) == (1001, 1002)
+    for uid, gid in ((0, 1000), (1000, 0), (-1, 1000), (1000, 2147483648)):
+        with pytest.raises(ValueError, match="non-root"):
+            Settings(sandbox_uid=uid, sandbox_gid=gid)
 
 
 def test_workroot_policy_depends_on_runtime(monkeypatch):

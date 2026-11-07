@@ -53,7 +53,7 @@ def build_run_kwargs(spec: SandboxSpec, settings: Any, paths: dict[str, Path]) -
         "nano_cpus": int(spec.limits.cpus * 1_000_000_000), "pids_limit": spec.limits.pids,
         "ulimits": [Ulimit(name="fsize", soft=50 * 1024 * 1024, hard=50 * 1024 * 1024),
                     Ulimit(name="nofile", soft=256, hard=256)],
-        "user": "1000:1000", "cap_drop": ["ALL"],
+        "user": f"{settings.sandbox_uid}:{settings.sandbox_gid}", "cap_drop": ["ALL"],
         "security_opt": ["no-new-privileges"], "environment": env, "use_config_proxy": False,
         "labels": {"pod.sandbox": "1", "pod.purpose": spec.purpose,
                    "pod.run_id": spec.run_id or ""},

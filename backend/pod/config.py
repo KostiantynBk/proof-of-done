@@ -20,6 +20,8 @@ class Settings:
     work_root: Path | None = None
     sandbox_image: str = field(default_factory=lambda: os.getenv("POD_SANDBOX_IMAGE", "pod-sandbox:latest"))
     runtime: str = field(default_factory=lambda: os.getenv("POD_SANDBOX_RUNTIME", "runsc"))
+    sandbox_uid: int = field(default_factory=lambda: int(os.getenv("POD_SANDBOX_UID", "1000")))
+    sandbox_gid: int = field(default_factory=lambda: int(os.getenv("POD_SANDBOX_GID", "1000")))
     sandbox_concurrency: int = field(default_factory=lambda: int(os.getenv("POD_SANDBOX_CONCURRENCY", "4")))
     require_capped_workroot: bool | None = None
     memory_mb: int = field(default_factory=lambda: int(os.getenv("POD_SANDBOX_MEMORY_MB", "512")))
@@ -42,5 +44,7 @@ class Settings:
             if raw not in {"0", "1"}:
                 raise ValueError("POD_REQUIRE_CAPPED_WORKROOT must be 0 or 1")
             self.require_capped_workroot = raw == "1"
+        if not (1 <= self.sandbox_uid <= 2147483647 and 1 <= self.sandbox_gid <= 2147483647):
+            raise ValueError("sandbox UID and GID must be positive non-root IDs")
         if self.sandbox_concurrency < 1:
             raise ValueError("sandbox concurrency must be positive")

@@ -14,7 +14,7 @@ from requests.exceptions import ReadTimeout
 
 def settings(tmp_path):
     return SimpleNamespace(work_root=tmp_path, sandbox_image="pod-sandbox:latest", runtime="runsc",
-                           sandbox_concurrency=4, require_capped_workroot=False)
+                           sandbox_concurrency=4, require_capped_workroot=False, sandbox_uid=1000, sandbox_gid=1000)
 
 
 def fake_client(container=None):
@@ -53,6 +53,15 @@ def test_run_kwargs_and_final_sdk_proxy_config(tmp_path):
     final = api.create_container_from_config.call_args.args[0]
     assert not any("PROXY=" in entry or "password" in entry for entry in final["Env"])
     api._proxy_configs.inject_proxy_environment.assert_not_called()
+
+
+def test_custom_sandbox_identity(tmp_path):
+    configured = settings(tmp_path)
+    configured.sandbox_uid, configured.sandbox_gid = 1001, 1002
+    kwargs = build_run_kwargs(SandboxSpec(purpose="x", command=[]), configured,
+                              {"work": tmp_path, "telemetry": tmp_path})
+    assert kwargs["user"] == "1001:1002"
+    assert kwargs["network_mode"] == "none" and kwargs["cap_drop"] == ["ALL"]
 
 
 def test_mount_longest_match_and_escape(tmp_path, monkeypatch):

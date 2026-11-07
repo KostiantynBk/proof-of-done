@@ -8,6 +8,7 @@ User=pod
 Group=pod
 WorkingDirectory=/srv/pod/app
 EnvironmentFile=/etc/pod/pod.env
+EnvironmentFile=/etc/pod/identity.env
 Environment=POD_DATA_DIR=/srv/pod/data
 Environment=POD_WORK_ROOT=/srv/pod/work
 Environment=POD_SANDBOX_RUNTIME=runsc

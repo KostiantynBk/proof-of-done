@@ -18,14 +18,20 @@ tar -C "$ROOT" -czf - \
   pyproject.toml backend sandbox samples deploy frontend/dist docs README.md LICENSE AGENTS.md 2>/dev/null \
   | $SSH "mkdir -p /srv/pod/app && tar -C /srv/pod/app -xzf - && chown -R pod:pod /srv/pod/app"
 
-$SSH bash -s <<REMOTE
+$SSH bash -s -- "$HOSTNAME_DASHED" <<'REMOTE'
 set -euo pipefail
+HOSTNAME_DASHED="$1"
 cd /srv/pod/app
-docker build -q -t pod-sandbox:latest sandbox/ >/dev/null
+uid=$(id -u pod); gid=$(id -g pod)
+[ "$uid" -gt 0 ] && [ "$gid" -gt 0 ]
+# Fail closed if bootstrap's service identity does not match the image being built.
+grep -Fxq "POD_SANDBOX_UID=$uid" /etc/pod/identity.env
+grep -Fxq "POD_SANDBOX_GID=$gid" /etc/pod/identity.env
+docker build -q --build-arg RUNNER_UID="$uid" --build-arg RUNNER_GID="$gid" -t pod-sandbox:latest sandbox/ >/dev/null
 [ -d .venv ] || sudo -u pod python3.12 -m venv .venv
 sudo -u pod .venv/bin/pip install -q -e '.[dev]'
 cp deploy/pod.service /etc/systemd/system/pod.service
-POD_HOSTNAME=$HOSTNAME_DASHED envsubst < deploy/Caddyfile.tmpl > /etc/caddy/Caddyfile 2>/dev/null || sed "s/{\\$POD_HOSTNAME}/$HOSTNAME_DASHED/" deploy/Caddyfile.tmpl > /etc/caddy/Caddyfile
+sed "s/{\$POD_HOSTNAME}/$HOSTNAME_DASHED/" deploy/Caddyfile.tmpl > /etc/caddy/Caddyfile
 systemctl daemon-reload
 systemctl enable --now pod.service
 systemctl restart pod.service

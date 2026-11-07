@@ -34,7 +34,12 @@ class InspectingContainers:
 def test_image_and_isolation():
     client = docker.from_env()
     client.ping()
-    image, _ = client.images.build(path=str(Path(__file__).resolve().parents[2] / "sandbox"), tag="pod-sandbox:test")
+    uid, gid = os.getuid(), os.getgid()
+    if uid == 0 or gid == 0:
+        pytest.fail("integration tests must run as a non-root service user")
+    image, _ = client.images.build(path=str(Path(__file__).resolve().parents[2] / "sandbox"),
+                                   tag="pod-sandbox:test",
+                                   buildargs={"RUNNER_UID": str(uid), "RUNNER_GID": str(gid)})
     # Reachability is an explicit prerequisite, not silently interpreted as isolation.
     connect = "import socket; s=socket.create_connection(('1.1.1.1',443),timeout=5); s.close(); print('connected')"
     control = client.containers.run(image.tags[0], ["python", "-c", connect], runtime="runc",
@@ -46,7 +51,8 @@ def test_image_and_isolation():
     workspace = Path(tempfile.mkdtemp(prefix="pod-integration-", dir=root))
     containers = InspectingContainers(client.containers)
     config = SimpleNamespace(work_root=workspace, sandbox_image=image.tags[0], runtime="runsc",
-                             sandbox_concurrency=2, require_capped_workroot=True)
+                             sandbox_concurrency=2, require_capped_workroot=True,
+                             sandbox_uid=uid, sandbox_gid=gid)
     runner = DockerSandboxRunner(config, SimpleNamespace(containers=containers))
 
     def execute(code, seconds=20):
