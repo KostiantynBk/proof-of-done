@@ -5,7 +5,7 @@ import json
 from collections import Counter
 from datetime import UTC, datetime
 
-from pod.pipeline.summary import effective_results, run_sandboxes
+from pod.pipeline.summary import completeness_summary, effective_results, run_sandboxes
 
 
 def canonical(value):
@@ -51,9 +51,24 @@ async def export_all(ctx):
                              'scored': sum(r.origin == origin and r.outcome in ('killed', 'survived')
                                            for r in effective.values())}
                     for origin in ('targeted', 'blind')}
+        completeness = completeness_summary(state, events)
         report += ['', f'AI said covered {covered} → proven {counts["PROVEN"]}',
                    f'Survival by origin: {canonical(survival)}',
-                   f'Model calls: {canonical(state.llm_calls)}', '']
+                   f'Recorded successful model calls (failed-call usage may be unrecorded): {canonical(state.llm_calls)}',
+                   '', '## Completeness and review',
+                   'A finished lifecycle or stage does not mean every operation succeeded.',
+                   f'Component failure entries: {completeness["component_failures"]} (not a failed-call count).',
+                   f'Skipped gap attempts: {len(completeness["skipped_gaps"])}.']
+        report += [f'- {s["item_id"] or "Unknown item"}: {s["reason"]}' for s in completeness['skipped_gaps']]
+        decisions = completeness['guard_decisions']
+        report.append('Guard decisions: ' + ', '.join(f'{status} {sum(g["decision"] == status for g in decisions)}'
+                                                     for status in ('approved', 'rejected', 'pending')) + '.')
+        report += [f'- {g["item_id"]}: {g["decision"]}; original {g["original"]}' for g in decisions]
+        if any(g['original'] == 'failed' for g in decisions):
+            report.append('Generated guard failed on original; may be a test defect, reviewer assessment required.')
+        report += [('A WEAK verdict means a recorded candidate survived; equivalent or off-target edits can survive. '
+                    'Model descriptions and relevance are not proof of a real defect. Only executed and verified '
+                    'evidence yields a ladder result; this does not prove absence of defects.'), '']
         agents = ['# Proven rules', '']
         patch = []
         patch_paths = set()
@@ -76,7 +91,9 @@ async def export_all(ctx):
                               f'{result.sandbox_id if result else ""} |')
             gap = state.gap_results.get(item.id)
             if gap:
-                report.append('Guard test: ' + gap.model_dump_json())
+                if gap.reveals_violation:
+                    report.append('Generated guard failed on original; may be a test defect, reviewer assessment required.')
+                report.append('Guard test (raw recorded fields, not independent confirmation): ' + gap.model_dump_json())
                 if gap.approved:
                     from pod.pipeline.gaps import checked_approval
                     # A restored or later-mutated proposal must not enter a patch.

@@ -1,6 +1,7 @@
 """Read-only projections of persisted run state and journal."""
 import hashlib
 import json
+import re
 from collections import Counter
 
 from pod.pipeline.context import RunState
@@ -91,6 +92,34 @@ def item_detail(store, run_id, item_id):
             'verdict': state.verdicts.get(item_id), 'gap': gap, 'sandboxes': sandboxes}
 
 
+def completeness_summary(state, events):
+    """Project fixed categories and known canonical IDs; never expose raw errors."""
+    known = {item.id for item in state.items if
+             (item.kind == 'requirement' and re.fullmatch(r'REQ-[0-9]{2,8}', item.id)) or
+             (item.kind == 'rule' and re.fullmatch(r'RULE-[0-9]{2,8}', item.id))}
+    reasons = {'six item limit': 'six item limit', 'LLMError': 'model response failed',
+               'BudgetExceeded': 'inference budget exhausted', 'ValueError': 'validation failed'}
+    skipped = []
+    for event in events:
+        if event.get('type') != 'gap_skipped':
+            continue
+        payload = event.get('payload')
+        payload = payload if isinstance(payload, dict) else {}
+        item_id, reason = payload.get('item_id'), payload.get('reason')
+        skipped.append({'item_id': item_id if isinstance(item_id, str) and item_id in known else None,
+                        'reason': reasons.get(reason, 'other failure') if isinstance(reason, str) else 'other failure'})
+    decisions = []
+    for item_id, gap in state.gap_results.items():
+        if item_id not in known:
+            continue
+        decisions.append({'item_id': item_id,
+                          'decision': 'pending' if gap.approved is None else 'approved' if gap.approved else 'rejected',
+                          'original': 'passed' if gap.passes_on_original else
+                                      'failed' if gap.reveals_violation else 'not passed'})
+    return {'component_failures': len(state.errors), 'skipped_gaps': skipped,
+            'guard_decisions': decisions}
+
+
 def build_summary(store, run_id):
     run = store.get_run(run_id)
     if not run:
@@ -112,7 +141,8 @@ def build_summary(store, run_id):
             current = stage['id']
         else:
             stage.update(status=p.get('status', 'done'), ended_at=e['ts'],
-                         detail=p.get('reason') or p.get('error'))
+                         detail=('Stage failed' if p.get('status') == 'failed' else
+                                 'Stage skipped' if p.get('status') == 'skipped' else None))
     counts = dict.fromkeys(['PROVEN', 'WEAK', 'UNTESTED', 'VIOLATED', 'UNVERIFIED', 'INCONCLUSIVE'], 0)
     for v in state.verdicts.values():
         counts[v.verdict] += 1
@@ -138,6 +168,7 @@ def build_summary(store, run_id):
             'inputs': {'spec_sha256': state.spec_sha256, 'tree_sha256': state.tree_sha256,
                        'history_records': state.history_records}, 'counts': counts,
             'ai_covered': sum(i['ai_status'] == 'covered' for i in items), 'items': items,
+            'completeness': completeness_summary(state, events),
             'journal': {'events': len(events), 'head_hash': events[-1]['hash'] if events else GENESIS,
                         'chain_ok': store.verify_chain(run_id)},
             'containment': {'sandboxes': len(sandboxes),

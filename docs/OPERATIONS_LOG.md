@@ -51,6 +51,14 @@ Operational observations, not product-evaluation results. No containment or qual
 - Four bounded probes through the actual Settings/client reasoning path returned matching IDs, filenames and parseable Python. These are static checks, not passing guards or mutation kills; provider-reported usage was 19,536 tokens. No generated test was approved from a probe.
 - Reviewer recheck found no remaining issue. Independent backend suite: **277 passed, 4 skipped**, Ruff passed. Next gate is a complete deployed real run with the experimental role controls, not another unbounded probe loop.
 
+## 2026-11-07 evening — Step D reviewed decisions and completion disclosure
+
+- Tuned real run `55cef2ea9d72408c9d96e4e1f89811b2` on product `627b314` produced six candidate guards. Independent semantic/receipt review supported only REQ-02 and REQ-03. Navigator approved those exact stored proposals and rejected REQ-07, REQ-08, RULE-01 and RULE-02 via the existing API, attributed explicitly to `Craft Agent navigator (delegated review)`, not user-personal review.
+- Actual postdecision result: **4 PROVEN, 6 WEAK, 2 UNTESTED**; two test files in the patch; **no proven rules**. All 65 sandbox receipts have teardown. Navigator independently verified the postdecision manifest digest, six signoffs, exact patch membership and unchanged live downloads. Four skipped gaps and one recorded failure entry remain.
+- Rejected RULE-01 fails because the generated test incorrectly assumes a class annotation. REQ-07/REQ-08 include equivalent surviving edits; RULE-02 tests a broader property than the mined rule. These are not established product defects. Recorded verdicts, mutations and bindings remain unchanged.
+- T15 adds read-only completeness warnings for historical live views and future ordinary report exports, plus explicit candidate-failure/review and mutation-equivalence caveats. Independent checks: **281 backend passed, 4 skipped; 11 frontend passed; Ruff and build passed**. Replacement reviewer found no blocker/high in scoped code.
+- Acceptance split: T15 does **not** regenerate historical downloads. Preserve the original four artifacts. A separately reviewed public supplement and clear download/provenance wording must be delivered before pinning or treating the run as finished submission evidence. No export refresh, new audit or pin has occurred.
+
 ## Current gates
 
 - Step B: server bootstrap, deployment, valid TLS and health verification — verified; low documentation follow-up fixed.
