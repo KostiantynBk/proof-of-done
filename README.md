@@ -11,7 +11,7 @@ an item **PROVEN**. The AI's own "covered" never does.
 Built for the [Vultr Agent Rush hackathon](https://lablab.ai/ai-hackathons/vultr-hackathon), Challenge 1
 **"Blast Radius Zero"**.
 
-> Live demo: _added at deploy time_ · Demo video: _added at submission_
+> Live app: https://108-61-195-77.sslip.io/ · Demo video: _added at submission_
 
 ---
 
@@ -19,9 +19,8 @@ Built for the [Vultr Agent Rush hackathon](https://lablab.ai/ai-hackathons/vultr
 
 - **Tests that pass are not tests that guard.** A requirement can be unimplemented while every test is
   green. AI coding agents make this worse: they report "done" when the tests pass.
-- **Regulated teams need traceability.** In finance (DORA Art. 9, PCI DSS 6.5) and health (FDA
-  software validation), teams must show that every written requirement is implemented **and** tested.
-  Today that is spreadsheet work.
+- **Regulated engineering workflows benefit from traceability.** Teams can use linked requirements,
+  tests and review evidence to support their own assessment; this demo does not certify compliance.
 - **Team rules live in review comments.** Coding agents never learn them, and hand-written `AGENTS.md`
   rules are unverified guesswork.
 
@@ -34,14 +33,27 @@ Built for the [Vultr Agent Rush hackathon](https://lablab.ai/ai-hackathons/vultr
 | S2–S3 Mine and verify | Turns review history into team rules. A rule is kept only if verified quotes come from **≥2 independent PRs or commits**. Counts are computed by code, never by the model. | Vultr Serverless Inference + deterministic code |
 | S4 Baseline | Runs the project's test suite **twice**, which detects flaky tests. | sandbox |
 | S5–S6 Audit | An AI cites the implementing code and the guarding tests as `file:line` plus a verbatim snippet. **Every citation is machine-checked**; fabricated or comment-only citations are discarded. | Vultr Serverless Inference + deterministic code |
-| S7–S8 Sabotage | Two passes per item: a *targeted* pass that sees the tests and a *blind adversary* pass that doesn't. Each writes the smallest edit that breaks the item. A static AST grammar allows only safe single edits: no imports, no harness tampering, no test edits. | Vultr Serverless Inference + deterministic code |
-| S9 Prove | **Every sabotage edit runs the full suite in its own fresh sandbox.** It counts as killed only if pytest names a failing test. A wall-clock timeout or a crash is never counted as a kill. | sandbox (parallel) |
+| S7–S8 Sabotage | Two passes per item: a *targeted* pass that sees the tests and a *blind adversary* pass that doesn't. The models propose small edits; a static AST grammar rejects unsupported edits, including imports, harness tampering and test edits. Semantic relevance is not guaranteed. | Vultr Serverless Inference + deterministic code |
+| S9 Prove | Eligible sabotage edits run the suite in fresh sandboxes. An edit counts as killed only if pytest names a failing test. A wall-clock timeout or a crash is never counted as a kill. | sandbox (parallel) |
 | S10 Verdict | Applies the verdict ladder: UNVERIFIED → VIOLATED → UNTESTED → WEAK → INCONCLUSIVE → PROVEN. | deterministic code |
-| S11 Close gaps | For WEAK and UNTESTED items, an AI writes a guard test. The sandbox proves it passes on the original code and kills the surviving sabotage edits. **A human approves it** before it enters the patch. | Vultr Serverless Inference + sandbox + human |
+| S11 Close gaps | For selected WEAK and UNTESTED items, an AI proposes a guard test. The sandbox checks it against original code and survivors; the reviewer must assess the result and approve it before patch inclusion. | Vultr Serverless Inference + sandbox + reviewer |
 | S12 Export | Produces `report.md`, an `AGENTS.md` with **only PROVEN rules**, a `receipts.json` manifest, and a `patch.diff` of approved tests. | orchestrator |
 
-Every model call and every sandbox run is recorded in a **hash-chained journal**, so receipts are
-tamper-evident.
+Successful recorded model calls and sandbox runs have **hash-chained journal** receipts. Failed-call
+usage may be absent. Hashes provide consistency checks, not authenticated signatures.
+
+## Recorded demo and review notes
+
+The tuned demo run `55cef2ea9d72408c9d96e4e1f89811b2` recorded **4 PROVEN, 6 WEAK,
+2 UNTESTED**, two approved generated guards and **no PROVEN rules**. A completed stage does not mean
+all operations succeeded: four gaps were skipped and one component-failure entry was recorded.
+[Supplementary review and limitations](docs/results/tuned-run-review.md) ·
+[Preserved evidence and original exports](docs/evidence/55cef2ea9d72408c9d96e4e1f89811b2/README.md).
+The original downloads predate the disclosure update and are preserved snapshots, not refreshed
+reports; the separate supplement is not covered by their receipt digest. The run was reviewed by
+Craft Agent navigator (delegated review), not personally by the user. A recorded survivor need not
+represent a real defect: mutations may be equivalent or off-target, and model descriptions can be wrong.
+The demo is seeded, not a benchmark, compliance certification or proof that defects are absent.
 
 ## The containment moment
 
@@ -51,7 +63,7 @@ it to `collector.attacker.invalid`, swallowing every error so that it "passes".
 
 Inside Proof of Done:
 
-- **Enforcement** (outside the sandbox; the code can't bypass it):
+- **Enforcement** (provided by the sandbox runtime and configuration):
   - The test runs in a gVisor (`runsc`) container with **no network**, a read-only root filesystem,
     512 MB memory, 1 CPU, 128 pids, file-size and open-file limits, a non-root user, all capabilities
     dropped, `no-new-privileges`, and a wall-clock kill.
@@ -62,8 +74,8 @@ Inside Proof of Done:
 - **The playground** lets anyone try it themselves: fake-key exfiltration, fork bomb, infinite loop,
   fill disk, read host secrets, `rm -rf /`, and a memory bomb.
 
-Telemetry is honest about its limits. The audit hook could be evaded by hostile code, but evading it
-never grants network or host access. Enforcement does not depend on the hook.
+The audit hook could be evaded by hostile code; it is best-effort telemetry, not the enforcement
+boundary. Isolation depends on gVisor, the container configuration and resource limits.
 
 ## How Vultr powers it
 
@@ -81,16 +93,18 @@ flowchart LR
   static web UI, Caddy (automatic HTTPS) and Docker with gVisor. The sandbox workspaces sit on a
   size- and inode-capped tmpfs. The VM is the system of control, not static hosting.
 - **Vultr Serverless Inference** (`https://api.vultrinference.com/v1`) handles **all** model calls,
-  with a different model family for each role:
+  with the following recorded role models for the tuned run:
 
 | Role | Default model | Why |
 |---|---|---|
 | extractor, miner | `deepseek-v4.1-flash-1017` | long context, low cost |
 | auditor, test writer | `glm-5.3` | agentic coding |
-| saboteur | `minimax-m3.1-flash` | a different family from the auditor, so sabotage is independent |
+| saboteur | `minimax-m3.1-flash` | a different model family from the auditor |
 
-The inference key exists only in the orchestrator's environment. It is never passed to sandboxes or
-written to receipts.
+The tuned run requested experimental `low` reasoning effort and `1024` reasoning max tokens for
+the auditor, saboteur and testwriter. These are provider requests, not a guaranteed hard cap; no
+judge-model execution is claimed. The inference key exists only in the orchestrator's environment.
+It is not passed to sandboxes or intentionally written to receipts.
 
 ## Run it locally
 
@@ -118,7 +132,9 @@ uvicorn pod.app:app --port 8000              # http://127.0.0.1:8000
 
 1. Create an Ubuntu 24.04 VM (Seattle, 4 vCPU / 8 GB) with your SSH key.
 2. Run `deploy/bootstrap.sh` as root on the VM. It installs Docker + gVisor `runsc`, Caddy and ufw,
-   creates a uid-1000 service user, and sets up a capped tmpfs for sandbox workspaces.
+   creates or reuses a non-root service identity with matching sandbox IDs, and sets up a capped tmpfs.
+   It chooses available matching IDs rather than replacing an existing user. On the reviewed VM,
+   `linuxuser` remains at 1000 and `pod` uses 1001.
 3. Put `VULTR_INFERENCE_API_KEY` in `/etc/pod/pod.env` (mode 0640, owned by `root:pod`).
 4. From your machine, run `deploy/deploy.sh <vm-ip>`. It builds the UI, ships the code, builds the
    sandbox image, installs the systemd unit and serves HTTPS on `<ip>.sslip.io`.

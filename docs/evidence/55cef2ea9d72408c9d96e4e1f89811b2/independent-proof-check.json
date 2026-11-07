@@ -1,0 +1,356 @@
+{
+  "errors": [],
+  "run_id": "55cef2ea9d72408c9d96e4e1f89811b2",
+  "event_count": 340,
+  "seq_range": [
+    172,
+    511
+  ],
+  "journal_final_hash": "b1fea63356b3c4a7c9926cf5d0312462fdb96c60862023aaa927507a8f2432c6",
+  "manifest_sha256": "23e0a85423381ac5ed6b7ebe229ecc831183b5d2a6bdbb6a432f76b18ce9209b",
+  "manifest_head_seq": 509,
+  "events_after_manifest": [
+    {
+      "seq": 510,
+      "type": "stage_finished"
+    },
+    {
+      "seq": 511,
+      "type": "run_finished"
+    }
+  ],
+  "snapshot_sha256": "e1bf6305462494b49599655e320a006dba5d4a1c359bd182f868a064ef61932b",
+  "snapshot_files": 12,
+  "product_files": 45,
+  "sandbox_count": 65,
+  "sandbox_image_digests": [
+    "sha256:0c6edc5075e36402d70571708f10d9c4d7558e7fadba82ac2f4144626d9144b9"
+  ],
+  "sandbox_outcomes": {
+    "passed": 30,
+    "tests_failed": 34,
+    "error": 1
+  },
+  "guard_reviews": [
+    {
+      "item_id": "REQ-02",
+      "inert_copy_exact_bytes": false,
+      "inert_copy_matches_after_crlf_normalization": true,
+      "content_sha256": "afd155486d89497726c4b585e00da0f462e20f125b6058d8be640ee64af5fc59",
+      "binding_seq": 456,
+      "identity_sha256": "d50a135e91ecab00c50343baa82fabaac5cd73bf538f17b294e64babea75ad83",
+      "result_sha256": "d135da58a525c4539a0de9df4284448b330f22b9df88c4682555e6d70099a2c1",
+      "original_sid": "37f56450e4cb4136aa92fa836312a513",
+      "original_outcome": "passed",
+      "original_nodes": [
+        "tests/test_pod_req_02.py::test_exactly_90_days_requires_no_approval",
+        "tests/test_pod_req_02.py::test_more_than_90_days_without_approval_rejected",
+        "tests/test_pod_req_02.py::test_more_than_90_days_with_manager_approval_proceeds",
+        "tests/test_pod_req_02.py::test_91_days_without_approval_rejected"
+      ],
+      "original_failures": [],
+      "checks": [
+        {
+          "mutation": "REQ-02-T1",
+          "sandbox_id": "d658a9032b4e42c9835443b930ff0b44",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_02.py::test_exactly_90_days_requires_no_approval",
+              "message": "refundly.errors.ApprovalRequired: manager approval required"
+            }
+          ]
+        },
+        {
+          "mutation": "REQ-02-T2",
+          "sandbox_id": "ea71dd81671241a2be3b176757347131",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_02.py::test_more_than_90_days_with_manager_approval_proceeds",
+              "message": "refundly.errors.ApprovalRequired: manager approval required"
+            }
+          ]
+        },
+        {
+          "mutation": "REQ-02-T3",
+          "sandbox_id": "ff409d4e8e184203be06e6687c97c8fe",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_02.py::test_more_than_90_days_without_approval_rejected",
+              "message": "Failed: DID NOT RAISE ApprovalRequired"
+            },
+            {
+              "node": "tests/test_pod_req_02.py::test_91_days_without_approval_rejected",
+              "message": "Failed: DID NOT RAISE ApprovalRequired"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item_id": "REQ-03",
+      "inert_copy_exact_bytes": false,
+      "inert_copy_matches_after_crlf_normalization": true,
+      "content_sha256": "910bcfc433c658a9c0d5bfbbe673ddc9a537be72e1287dd208122143df093e1d",
+      "binding_seq": 470,
+      "identity_sha256": "687d72b817bfbeabe8ada1d658acbef1a3ea1fd89558d7ffb081a91b76800986",
+      "result_sha256": "7265d9cc93f537071d3f5b65a7fc0648e7ec2a273c63e41c9c9ddfc1f809dcc1",
+      "original_sid": "71cc5350570847a9a07c366996297377",
+      "original_outcome": "passed",
+      "original_nodes": [
+        "tests/test_pod_req_03.py::test_audit_record_contains_all_required_fields",
+        "tests/test_pod_req_03.py::test_each_issued_refund_creates_one_audit_record"
+      ],
+      "original_failures": [],
+      "checks": [
+        {
+          "mutation": "REQ-03-B1",
+          "sandbox_id": "f18984563ee746b59de992a6c0a31952",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_03.py::test_audit_record_contains_all_required_fields",
+              "message": "AssertionError: assert '' == 'alice'\n  \n  - alice"
+            },
+            {
+              "node": "tests/test_pod_req_03.py::test_each_issued_refund_creates_one_audit_record",
+              "message": "AssertionError: assert '' == 'alice'\n  \n  - alice"
+            }
+          ]
+        },
+        {
+          "mutation": "REQ-03-B2",
+          "sandbox_id": "eb5d96964a194ee2ab780f8fc1302e2f",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_03.py::test_audit_record_contains_all_required_fields",
+              "message": "AssertionError: assert '' == 'damaged item'\n  \n  - damaged item"
+            },
+            {
+              "node": "tests/test_pod_req_03.py::test_each_issued_refund_creates_one_audit_record",
+              "message": "AssertionError: assert '' == 'late delivery'\n  \n  - late delivery"
+            }
+          ]
+        },
+        {
+          "mutation": "REQ-03-T2",
+          "sandbox_id": "cb2464f392c74b64af19e6c43307d102",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_03.py::test_audit_record_contains_all_required_fields",
+              "message": "AssertionError: assert 'damaged item' == 'alice'\n  \n  - alice\n  + damaged item"
+            },
+            {
+              "node": "tests/test_pod_req_03.py::test_each_issued_refund_creates_one_audit_record",
+              "message": "AssertionError: assert 'return' == 'alice'\n  \n  - alice\n  + return"
+            }
+          ]
+        },
+        {
+          "mutation": "REQ-03-T3",
+          "sandbox_id": "8b8e4a8c56564147b64dee1d859114dc",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_req_03.py::test_audit_record_contains_all_required_fields",
+              "message": "AssertionError: assert 'alice' == 'order-1'\n  \n  - order-1\n  + alice"
+            },
+            {
+              "node": "tests/test_pod_req_03.py::test_each_issued_refund_creates_one_audit_record",
+              "message": "AssertionError: assert 'bob' == 'order-1'\n  \n  - order-1\n  + bob"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item_id": "REQ-07",
+      "inert_copy_exact_bytes": false,
+      "inert_copy_matches_after_crlf_normalization": true,
+      "content_sha256": "3f6c6fa2640f183fc5eab0b6c1e235faf628fd1dbd58ba32a43566e26a15ab2a",
+      "binding_seq": 478,
+      "identity_sha256": "427cba1cd0622b6b4f05974ea612b14d49615d79365d847866e1d64849f33955",
+      "result_sha256": "9952fc53f1aa051604f5e43ad0de1ff5268b9beabd6a67f37a5229123a27b6e8",
+      "original_sid": "4f5956062d81439db220c200b9b89e16",
+      "original_outcome": "passed",
+      "original_nodes": [
+        "tests/test_pod_req_07.py::test_third_failure_marks_failed_and_no_money_moves"
+      ],
+      "original_failures": [],
+      "checks": [
+        {
+          "mutation": "REQ-07-B3",
+          "sandbox_id": "20a10e9bfefb42c7a76c3e5cdc252702",
+          "outcome": "passed",
+          "exit_code": 0,
+          "failed": []
+        }
+      ]
+    },
+    {
+      "item_id": "REQ-08",
+      "inert_copy_exact_bytes": false,
+      "inert_copy_matches_after_crlf_normalization": true,
+      "content_sha256": "4fef61c9d12621c4a3f2f8640793b05e4b06921db6276144a82ae304a6db2a6a",
+      "binding_seq": 486,
+      "identity_sha256": "f574cc2108ffe4e26e9a08d04652fafbd0aeb8ec325fe9f5c63499a1261d83d9",
+      "result_sha256": "887b89352341a5c8121184b204ea66e067eabb84e322c6e69ac6a676c5bbcf23",
+      "original_sid": "7d9eccfca5d5492789f5462acd5d9831",
+      "original_outcome": "passed",
+      "original_nodes": [
+        "tests/test_pod_req_08.py::test_fractional_cent_is_discarded",
+        "tests/test_pod_req_08.py::test_exact_cent_amount_is_unchanged",
+        "tests/test_pod_req_08.py::test_odd_cent_amount_is_unchanged",
+        "tests/test_pod_req_08.py::test_just_below_next_cent_rounds_down",
+        "tests/test_pod_req_08.py::test_partial_refund_via_service_rounds_down",
+        "tests/test_pod_req_08.py::test_partial_refund_on_cent_grid_is_exact",
+        "tests/test_pod_req_08.py::test_rounded_amount_never_exceeds_requested"
+      ],
+      "original_failures": [],
+      "checks": [
+        {
+          "mutation": "REQ-08-T6",
+          "sandbox_id": "b0e7de4bcc5f425fb3ed67925e935149",
+          "outcome": "passed",
+          "exit_code": 0,
+          "failed": []
+        }
+      ]
+    },
+    {
+      "item_id": "RULE-01",
+      "inert_copy_exact_bytes": false,
+      "inert_copy_matches_after_crlf_normalization": true,
+      "content_sha256": "7947be15b51816d335385ad63269fc115d46082ca9c97facbf2bfff73eae3c90",
+      "binding_seq": 498,
+      "identity_sha256": "2c7cdb6bec8ea10320ecd87162ae5a6bf1d39dfb8bd2324613e00496862e502c",
+      "result_sha256": "2ee035bdab98108afde6b5d3b110766654ed1ae707c7a60a958a3b869e67cd09",
+      "original_sid": "34934aae21c940379b30c1962c99ed33",
+      "original_outcome": "tests_failed",
+      "original_nodes": [
+        "tests/test_pod_rule_01.py::test_zero_refund_rejected_as_invalid_amount",
+        "tests/test_pod_rule_01.py::test_negative_zero_refund_rejected",
+        "tests/test_pod_rule_01.py::test_audit_event_amount_is_decimal",
+        "tests/test_pod_rule_01.py::test_audit_record_preserves_decimal_amount",
+        "tests/test_pod_rule_01.py::test_gateway_transfer_amount_is_decimal",
+        "tests/test_pod_rule_01.py::test_gateway_transfer_keeps_exact_cents",
+        "tests/test_pod_rule_01.py::test_refund_result_amount_is_decimal",
+        "tests/test_pod_rule_01.py::test_money_helper_rejects_float"
+      ],
+      "original_failures": [
+        {
+          "node": "tests/test_pod_rule_01.py::test_gateway_transfer_amount_is_decimal",
+          "message": "KeyError: 'transfers'"
+        }
+      ],
+      "checks": [
+        {
+          "mutation": "RULE-01-B1",
+          "sandbox_id": "c5de2680e30b43ebaf3a7bc29e5eff1a",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_rule_01.py::test_audit_event_amount_is_decimal",
+              "message": "AssertionError: <class 'float'>\nassert <class 'float'> is Decimal"
+            },
+            {
+              "node": "tests/test_pod_rule_01.py::test_gateway_transfer_amount_is_decimal",
+              "message": "KeyError: 'transfers'"
+            }
+          ]
+        },
+        {
+          "mutation": "RULE-01-B2",
+          "sandbox_id": "a374ebb1d04c4b50862d01858255ad0b",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_rule_01.py::test_gateway_transfer_amount_is_decimal",
+              "message": "KeyError: 'transfers'"
+            }
+          ]
+        },
+        {
+          "mutation": "RULE-01-T2",
+          "sandbox_id": "b91e790e192343c19dfacf92025b005b",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_rule_01.py::test_gateway_transfer_amount_is_decimal",
+              "message": "KeyError: 'transfers'"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "item_id": "RULE-02",
+      "inert_copy_exact_bytes": false,
+      "inert_copy_matches_after_crlf_normalization": true,
+      "content_sha256": "daf38d83061154c693b944c66131b65f5997e4b7cf69dc5cd5aeea664a57ffd4",
+      "binding_seq": 506,
+      "identity_sha256": "86850d0cd56286897952f0652d4fc7412822d134305cc08fbd1948ec52fdd42c",
+      "result_sha256": "f7fed066eb8f0d4fdf093df224350d2ff03d1172d25924f0b8b312579dec1f70",
+      "original_sid": "5e7401298fb84e47bbc1808c06585766",
+      "original_outcome": "passed",
+      "original_nodes": [
+        "tests/test_pod_rule_02.py::test_clock_now_is_timezone_aware",
+        "tests/test_pod_rule_02.py::test_clock_now_matches_utc_now_within_tolerance",
+        "tests/test_pod_rule_02.py::test_service_uses_injected_clock_for_approval_window"
+      ],
+      "original_failures": [],
+      "checks": [
+        {
+          "mutation": "RULE-02-T4",
+          "sandbox_id": "69c8073d76a249e3b2c3d089a4a3c5fa",
+          "outcome": "tests_failed",
+          "exit_code": 1,
+          "failed": [
+            {
+              "node": "tests/test_pod_rule_02.py::test_clock_now_is_timezone_aware",
+              "message": "AssertionError: clock.now() must return an aware datetime\nassert None is not None\n +  where None = datetime.datetime(2026, 11, 7, 13, 46, 37, 454925).tzinfo"
+            },
+            {
+              "node": "tests/test_pod_rule_02.py::test_clock_now_matches_utc_now_within_tolerance",
+              "message": "TypeError: can't compare offset-naive and offset-aware datetimes"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "gap_skipped": [
+    {
+      "item_id": "RULE-03",
+      "reason": "six item limit"
+    },
+    {
+      "item_id": "RULE-04",
+      "reason": "six item limit"
+    },
+    {
+      "item_id": "REQ-04",
+      "reason": "six item limit"
+    },
+    {
+      "item_id": "REQ-05",
+      "reason": "six item limit"
+    }
+  ],
+  "recorded_llm_calls": 53,
+  "recorded_llm_tokens": 255237
+}

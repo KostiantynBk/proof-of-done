@@ -1,0 +1,437 @@
+{
+  "id": "55cef2ea9d72408c9d96e4e1f89811b2",
+  "created_at": "2026-11-07T13:43:50.709679+00:00",
+  "status": "done",
+  "project": "demo:refundly",
+  "stage": "S12",
+  "stages": [
+    {
+      "id": "S0",
+      "name": "Ingest",
+      "status": "done",
+      "started_at": "2026-11-07T13:43:50.718025+00:00",
+      "ended_at": "2026-11-07T13:43:51.636559+00:00",
+      "detail": null
+    },
+    {
+      "id": "S1",
+      "name": "Extract requirements",
+      "status": "done",
+      "started_at": "2026-11-07T13:43:51.643459+00:00",
+      "ended_at": "2026-11-07T13:44:06.920438+00:00",
+      "detail": null
+    },
+    {
+      "id": "S2",
+      "name": "Mine rules",
+      "status": "done",
+      "started_at": "2026-11-07T13:44:06.930912+00:00",
+      "ended_at": "2026-11-07T13:44:17.056051+00:00",
+      "detail": null
+    },
+    {
+      "id": "S3",
+      "name": "Verify quotes",
+      "status": "done",
+      "started_at": "2026-11-07T13:44:17.062242+00:00",
+      "ended_at": "2026-11-07T13:44:17.071751+00:00",
+      "detail": null
+    },
+    {
+      "id": "S4",
+      "name": "Baseline",
+      "status": "done",
+      "started_at": "2026-11-07T13:44:17.083690+00:00",
+      "ended_at": "2026-11-07T13:44:20.329421+00:00",
+      "detail": null
+    },
+    {
+      "id": "S5",
+      "name": "Audit",
+      "status": "done",
+      "started_at": "2026-11-07T13:44:20.347703+00:00",
+      "ended_at": "2026-11-07T13:44:27.350571+00:00",
+      "detail": null
+    },
+    {
+      "id": "S6",
+      "name": "Verify evidence",
+      "status": "done",
+      "started_at": "2026-11-07T13:44:27.359975+00:00",
+      "ended_at": "2026-11-07T13:44:27.602659+00:00",
+      "detail": null
+    },
+    {
+      "id": "S7",
+      "name": "Sabotage",
+      "status": "done",
+      "started_at": "2026-11-07T13:44:27.627002+00:00",
+      "ended_at": "2026-11-07T13:45:01.522277+00:00",
+      "detail": null
+    },
+    {
+      "id": "S8",
+      "name": "Validate mutations",
+      "status": "done",
+      "started_at": "2026-11-07T13:45:01.548003+00:00",
+      "ended_at": "2026-11-07T13:45:14.229929+00:00",
+      "detail": null
+    },
+    {
+      "id": "S9",
+      "name": "Prove",
+      "status": "done",
+      "started_at": "2026-11-07T13:45:14.267242+00:00",
+      "ended_at": "2026-11-07T13:45:35.816414+00:00",
+      "detail": null
+    },
+    {
+      "id": "S10",
+      "name": "Verdict",
+      "status": "done",
+      "started_at": "2026-11-07T13:45:35.902105+00:00",
+      "ended_at": "2026-11-07T13:45:35.917375+00:00",
+      "detail": null
+    },
+    {
+      "id": "S11",
+      "name": "Close gaps",
+      "status": "done",
+      "started_at": "2026-11-07T13:45:36.008736+00:00",
+      "ended_at": "2026-11-07T13:46:37.870819+00:00",
+      "detail": null
+    },
+    {
+      "id": "S12",
+      "name": "Export",
+      "status": "done",
+      "started_at": "2026-11-07T14:02:33.217014+00:00",
+      "ended_at": "2026-11-07T14:02:33.382789+00:00",
+      "detail": null
+    }
+  ],
+  "inputs": {
+    "spec_sha256": "e10406784a40f37d87fce284bd9a329fa2428fa9767bfdac810a50c12ebbcaaa",
+    "tree_sha256": "e1bf6305462494b49599655e320a006dba5d4a1c359bd182f868a064ef61932b",
+    "history_records": 66
+  },
+  "counts": {
+    "PROVEN": 4,
+    "WEAK": 6,
+    "UNTESTED": 2,
+    "VIOLATED": 0,
+    "UNVERIFIED": 0,
+    "INCONCLUSIVE": 0
+  },
+  "ai_covered": 10,
+  "items": [
+    {
+      "id": "REQ-01",
+      "kind": "requirement",
+      "title": "Refund cap",
+      "statement": "A refund amount must never exceed the captured amount minus refunds already issued.",
+      "verdict": "PROVEN",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 3,
+        "killed": 3,
+        "survived": 0,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 0,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 2,
+        "blind": 1
+      }
+    },
+    {
+      "id": "REQ-02",
+      "kind": "requirement",
+      "title": "Late refund approval",
+      "statement": "Refunds requested more than 90 days after the order date require manager approval.",
+      "verdict": "PROVEN",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 3,
+        "killed": 3,
+        "survived": 0,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 0,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 3,
+        "blind": 0
+      }
+    },
+    {
+      "id": "REQ-03",
+      "kind": "requirement",
+      "title": "Refund audit record",
+      "statement": "Every issued refund must create an audit record containing actor, amount, reason, and order id.",
+      "verdict": "PROVEN",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 5,
+        "killed": 5,
+        "survived": 0,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 0,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 3,
+        "blind": 2
+      }
+    },
+    {
+      "id": "REQ-04",
+      "kind": "requirement",
+      "title": "Original payment method",
+      "statement": "A refund must be returned to the original payment method, and requests to a different method are rejected except for the gift card policy below.",
+      "verdict": "UNTESTED",
+      "ai_status": "untested",
+      "mutations": {
+        "tried": 4,
+        "killed": 2,
+        "survived": 2,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 2,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 2,
+        "blind": 2
+      }
+    },
+    {
+      "id": "REQ-05",
+      "kind": "requirement",
+      "title": "Gift card refunds",
+      "statement": "Orders paid by gift card are refunded only as store credit.",
+      "verdict": "UNTESTED",
+      "ai_status": "contradicts",
+      "mutations": {
+        "tried": 3,
+        "killed": 2,
+        "survived": 1,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 1,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 3,
+        "blind": 0
+      }
+    },
+    {
+      "id": "REQ-06",
+      "kind": "requirement",
+      "title": "Refund idempotency",
+      "statement": "Refund requests are idempotent: the same request_id processed twice results in exactly one refund.",
+      "verdict": "PROVEN",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 3,
+        "killed": 3,
+        "survived": 0,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 0,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 3,
+        "blind": 0
+      }
+    },
+    {
+      "id": "REQ-07",
+      "kind": "requirement",
+      "title": "Gateway retry limit",
+      "statement": "Gateway refund calls are retried at most 3 times; after the third failure the refund is marked FAILED and no money moves.",
+      "verdict": "WEAK",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 5,
+        "killed": 4,
+        "survived": 1,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 0,
+        "blind": 1
+      },
+      "mutations_by_origin": {
+        "targeted": 3,
+        "blind": 2
+      }
+    },
+    {
+      "id": "REQ-08",
+      "kind": "requirement",
+      "title": "Partial refund rounding",
+      "statement": "Partial refund amounts are rounded down to the cent.",
+      "verdict": "WEAK",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 2,
+        "killed": 1,
+        "survived": 1,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 1,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 1,
+        "blind": 1
+      }
+    },
+    {
+      "id": "RULE-01",
+      "kind": "rule",
+      "title": "Use Decimal and money helpers for all monetary amounts; never use float arithmetic.",
+      "statement": "Use Decimal and money helpers for all monetary amounts; never use float arithmetic.",
+      "verdict": "WEAK",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 4,
+        "killed": 1,
+        "survived": 3,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 1,
+        "blind": 2
+      },
+      "mutations_by_origin": {
+        "targeted": 2,
+        "blind": 2
+      }
+    },
+    {
+      "id": "RULE-02",
+      "kind": "rule",
+      "title": "Use clock.now() for current timestamps instead of datetime.now() or datetime.utcnow().",
+      "statement": "Use clock.now() for current timestamps instead of datetime.now() or datetime.utcnow().",
+      "verdict": "WEAK",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 1,
+        "killed": 0,
+        "survived": 1,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 1,
+        "blind": 0
+      },
+      "mutations_by_origin": {
+        "targeted": 1,
+        "blind": 0
+      }
+    },
+    {
+      "id": "RULE-03",
+      "kind": "rule",
+      "title": "Record audit events with audit.record(); do not use logger.info or print for audit events.",
+      "statement": "Record audit events with audit.record(); do not use logger.info or print for audit events.",
+      "verdict": "WEAK",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 5,
+        "killed": 3,
+        "survived": 2,
+        "invalid": 0,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 0,
+        "blind": 2
+      },
+      "mutations_by_origin": {
+        "targeted": 3,
+        "blind": 2
+      }
+    },
+    {
+      "id": "RULE-04",
+      "kind": "rule",
+      "title": "Raise refundly.errors exceptions for rejections; do not raise bare ValueError or Exception.",
+      "statement": "Raise refundly.errors exceptions for rejections; do not raise bare ValueError or Exception.",
+      "verdict": "WEAK",
+      "ai_status": "covered",
+      "mutations": {
+        "tried": 5,
+        "killed": 2,
+        "survived": 2,
+        "invalid": 1,
+        "timeout": 0
+      },
+      "survived_by_origin": {
+        "targeted": 1,
+        "blind": 1
+      },
+      "mutations_by_origin": {
+        "targeted": 1,
+        "blind": 3
+      }
+    }
+  ],
+  "journal": {
+    "events": 358,
+    "head_hash": "f6267154ab8573e2a9c71a53dd2c2798664b8592b4ffdfe875ef949cb99354bc",
+    "chain_ok": true
+  },
+  "containment": {
+    "sandboxes": 65,
+    "destroyed": 65,
+    "timeouts": 0,
+    "oom": 0,
+    "telemetry": {
+      "honeytoken_read": 64,
+      "dns_lookup": 64
+    }
+  },
+  "models": {
+    "extractor": "deepseek-v4.1-flash-1017",
+    "miner": "deepseek-v4.1-flash-1017",
+    "auditor": "glm-5.3",
+    "saboteur": "minimax-m3.1-flash",
+    "testwriter": "glm-5.3"
+  },
+  "tokens": {
+    "prompt": 205461,
+    "completion": 49776
+  },
+  "exports": [
+    "report.md",
+    "AGENTS.md",
+    "receipts.json",
+    "patch.diff"
+  ]
+}

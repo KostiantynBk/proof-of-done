@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/react';
 import {afterEach, describe, expect, it} from 'vitest';
 import {cleanup} from '@testing-library/react';
-import {CompletenessPanel, GuardAssessment, MutationCaveat} from './components';
+import {CompletenessPanel, ExportNotice, GuardAssessment, MutationCaveat} from './components';
 
 afterEach(cleanup);
 
@@ -21,6 +21,15 @@ describe('honest completeness', () => {
     expect(screen.getByText(/RULE-01: rejected/)).toBeTruthy();
     expect(screen.getByText(/may be a test defect, reviewer assessment required/)).toBeTruthy();
     expect(screen.queryByText(/confirmed violation/i)).toBeNull();
+  });
+
+  it('distinguishes saved downloads from the separate run-specific supplement', () => {
+    render(<ExportNotice/>);
+    expect(screen.getByText(/Downloads are preserved snapshots/)).toBeTruthy();
+    expect(screen.getByText(/applies only to the run identified there/)).toBeTruthy();
+    expect(screen.getByRole('link', {name: 'Recorded-demo review supplement'}).getAttribute('href'))
+      .toBe('https://github.com/KostiantynBk/proof-of-done/blob/main/docs/results/tuned-run-review.md');
+    expect(screen.queryByText(/refreshed/i)).toBeNull();
   });
 
   it('distinguishes review from confirmation and explains mutation limits', () => {

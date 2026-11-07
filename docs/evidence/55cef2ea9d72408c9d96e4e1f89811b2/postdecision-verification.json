@@ -1,0 +1,34 @@
+{
+  "run_id": "55cef2ea9d72408c9d96e4e1f89811b2",
+  "status": "done",
+  "counts": {
+    "PROVEN": 4,
+    "WEAK": 6,
+    "UNTESTED": 2,
+    "VIOLATED": 0,
+    "UNVERIFIED": 0,
+    "INCONCLUSIVE": 0
+  },
+  "manifest_digest_valid": true,
+  "signoffs": 6,
+  "approved_items": [
+    "REQ-02",
+    "REQ-03"
+  ],
+  "patch_files": [
+    "+++ b/tests/test_pod_req_02.py",
+    "+++ b/tests/test_pod_req_03.py"
+  ],
+  "proven_rules": 0,
+  "live_exports_match_saved": true,
+  "containment": {
+    "sandboxes": 65,
+    "destroyed": 65,
+    "timeouts": 0,
+    "oom": 0,
+    "telemetry": {
+      "honeytoken_read": 64,
+      "dns_lookup": 64
+    }
+  }
+}

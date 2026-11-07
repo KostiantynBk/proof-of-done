@@ -1,0 +1,76 @@
+--- /dev/null
++++ b/tests/test_pod_req_02.py
+@@ -0,0 +1,45 @@
++from datetime import timedelta
++from decimal import Decimal
++
++import pytest
++from refundly.errors import ApprovalRequired
++
++
++def issue(service, order, request_id="req-1", amount="10.00", **kwargs):
++    return service.issue(order, request_id, Decimal(amount), "alice", "return", **kwargs)
++
++
++def test_exactly_90_days_requires_no_approval(context):
++    current, order, gateway, audit, service = context
++    order.created_at = current - timedelta(days=90)
++    result = issue(service, order)
++    assert result.status == "ISSUED"
++    assert len(gateway.transfers) == 1
++    assert order.refunded == Decimal("10.00")
++
++
++def test_more_than_90_days_without_approval_rejected(context):
++    current, order, gateway, _, service = context
++    order.created_at = current - timedelta(days=90, seconds=1)
++    with pytest.raises(ApprovalRequired):
++        issue(service, order)
++    assert len(gateway.transfers) == 0
++    assert order.refunded == Decimal("0.00")
++
++
++def test_more_than_90_days_with_manager_approval_proceeds(context):
++    current, order, gateway, audit, service = context
++    order.created_at = current - timedelta(days=120)
++    result = issue(service, order, manager_approved=True)
++    assert result.status == "ISSUED"
++    assert len(gateway.transfers) == 1
++    assert len(audit.events) == 1
++    assert order.refunded == Decimal("10.00")
++
++
++def test_91_days_without_approval_rejected(context):
++    current, order, gateway, _, service = context
++    order.created_at = current - timedelta(days=91)
++    with pytest.raises(ApprovalRequired):
++        issue(service, order)
++    assert len(gateway.transfers) == 0
+--- /dev/null
++++ b/tests/test_pod_req_03.py
+@@ -0,0 +1,25 @@
++from decimal import Decimal
++
++
++def test_audit_record_contains_all_required_fields(context):
++    _, order, _, audit, service = context
++    service.issue(order, "req-1", Decimal("10.00"), "alice", "damaged item")
++    assert len(audit.events) == 1
++    event = audit.events[0]
++    assert event.actor == "alice"
++    assert event.amount == Decimal("10.00")
++    assert event.reason == "damaged item"
++    assert event.order_id == "order-1"
++    assert event.action == "refund_issued"
++
++
++def test_each_issued_refund_creates_one_audit_record(context):
++    _, order, _, audit, service = context
++    service.issue(order, "req-1", Decimal("10.00"), "alice", "return")
++    service.issue(order, "req-2", Decimal("20.00"), "bob", "late delivery")
++    assert len(audit.events) == 2
++    assert audit.events[0].actor == "alice"
++    assert audit.events[1].actor == "bob"
++    assert audit.events[1].amount == Decimal("20.00")
++    assert audit.events[1].reason == "late delivery"
++    assert audit.events[1].order_id == "order-1"

@@ -1,3 +1,4 @@
+import copy
 import json
 
 import pytest
@@ -54,6 +55,35 @@ def test_t14_like_decision_counts():
     result = completeness_summary(state, [])['guard_decisions']
     assert [x['decision'] for x in result] == ['approved', 'approved', 'pending', 'rejected']
     assert result[-1]['original'] == 'failed'
+
+
+def test_six_decisions_and_projection_do_not_mutate_inputs():
+    state = make_state()
+    state.requirements.extend(
+        Item(id=f'REQ-0{i}', kind='requirement', title='item', statement='requirement',
+             source_checks=[], source_verified=True) for i in (5, 6)
+    )
+    for index, item in enumerate(state.items):
+        state.gap_results[item.id] = GapTestResult(item_id=item.id, file='tests/x.py',
+                                                  passes_on_original=index != 5,
+                                                  reveals_violation=index == 5, approved=index < 2)
+    events = [{'type': 'gap_skipped', 'payload': {'item_id': 'REQ-05', 'reason': 'six item limit'}}]
+    original_state, original_events = state.model_dump(mode='json'), copy.deepcopy(events)
+    decisions = completeness_summary(state, events)['guard_decisions']
+    assert [sum(d['decision'] == kind for d in decisions) for kind in ('approved', 'rejected', 'pending')] == [2, 4, 0]
+    assert state.model_dump(mode='json') == original_state
+    assert events == original_events
+
+
+@pytest.mark.asyncio
+async def test_clean_report_does_not_assert_guard_failed(tmp_path):
+    store = Store(tmp_path / 'db')
+    store.create_run('r', 'demo:example', status='done')
+    ctx = RunContext('r', tmp_path / 'project', '', [], Settings(data_dir=tmp_path), None, None, store, make_state())
+    await export_all(ctx)
+    report = store.get_artifact('r', 'report.md')['content']
+    assert 'Component failure entries: 0' in report
+    assert 'Generated guard failed on original' not in report
 
 
 @pytest.mark.asyncio
