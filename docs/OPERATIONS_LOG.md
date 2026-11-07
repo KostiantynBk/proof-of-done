@@ -29,6 +29,15 @@ Operational observations, not product-evaluation results. No containment or qual
 - Seven stored public playground receipts independently checked: all used runsc and had destruction timestamps with no cleanup errors. Exfil attempt recorded fake-canary read/DNS lookup and failure; loop timed out; memory OOM-killed; fork terminated with error/2; file-size limit produced EFBIG; shadow access denied and Docker socket absent. Root-deletion preset ignores errors, so its exit status alone is not proof of root protection. Final public health: `sandbox_leaked=0`.
 - Navigator artifacts: session `261107-alert-heron/data/step-c-independent-docker.log`, `.exit`, `step-c-independent-unit.log`, `step-c-preset-verification.json`. Builder raw evidence: `hackathon-entry/tickets/T9-artifacts/`; reviews: `T9-containment-review.md`, `T9-fix2-review.md`.
 
+## 2026-11-07 — Step D baseline and structured-output diagnosis (not ready to pin)
+
+- Real service audit `57444101c07d4e90a54d20a7db2ea062`, product revision `2becfef`, reached terminal `done`, but generated no guard proposals: four guard attempts were skipped on inference errors. Terminal lifecycle state must not be read as complete successful coverage.
+- Actual verdicts: 1 PROVEN, 2 WEAK, 4 UNTESTED, 5 INCONCLUSIVE; 8 source-verified requirements and 4 rules. Recorded 19 runsc sandboxes had teardown. Navigator independently inspected the public UI, replayed SSE through HTTPS, and recomputed all 171 retained journal events to head `badcf62dc7f10c244ad83a0f7ee7f57f3be964a2f37576ee00133d7d75ce9348`.
+- Recorded successful calls report 172,850 tokens across 20 records; this excludes unrecorded failed/repair attempts and is not a total billing claim. Semantic seeded-label comparison was 3/12; supplied expected labels were not independently oracle-verified. No benchmark claim, approvals or pin.
+- Six bounded role probes on the exact baseline context produced 11 provider responses: selected auditor and saboteur responses exhausted both 4,096 and 8,192 output budgets with zero content and provider-reported reasoning consuming essentially the whole cap. Testwriter validated on repair at the lower budget and initially at the higher budget, single examples only. This establishes a symptom for these probes, not the cause of every historical failure or a reliability fix. Probe-reported usage totals 106,118 tokens including repairs.
+- Added opt-in, metadata-only diagnostic sink, not wired to public service/API. No model settings, token defaults, validators or runtime flags changed. Review found no blocker/high/medium; independent local tests **241 passed, 4 skipped**, Ruff passed. Further provider-supported reasoning-control experiments are separately gated.
+- Evidence: `hackathon-entry/tickets/T10-artifacts/`, `T11-artifacts/`, reports T10/T11 and T11-diagnostics review; navigator session `261107-alert-heron/data/step-d-*`.
+
 ## Current gates
 
 - Step B: server bootstrap, deployment, valid TLS and health verification — verified; low documentation follow-up fixed.

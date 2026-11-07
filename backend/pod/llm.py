@@ -7,12 +7,14 @@ import json
 import re
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, get_args
 
 import httpx
 from pydantic import BaseModel, ValidationError
+from pydantic_core import ErrorType
 
 
 class BudgetExceeded(RuntimeError):
@@ -132,11 +134,51 @@ def _extract_json(text: str) -> str:
     return text[start:]
 
 
+def _safe_identifier(value: str, key: str) -> str:
+    return value if key not in value and re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', value) else '<redacted>'
+
+
+def _schema_fields(value: Any) -> set[str]:
+    """Only schema-declared field names may appear in diagnostic locations."""
+    if isinstance(value, dict):
+        names = set(value.get('properties', {})) if isinstance(value.get('properties'), dict) else set()
+        for child in value.values():
+            names.update(_schema_fields(child))
+        return names
+    if isinstance(value, list):
+        return set().union(*(_schema_fields(child) for child in value)) if value else set()
+    return set()
+
+
+def _validation_locations(exc: Exception, schema: dict[str, Any]) -> list[dict[str, Any]]:
+    if not isinstance(exc, ValidationError):
+        return [{'loc': [], 'type': 'unknown'}]
+    fields = _schema_fields(schema)
+    types = set(get_args(ErrorType))
+    result = []
+    for error in exc.errors(include_input=False, include_context=False, include_url=False)[:20]:
+        loc = [part if isinstance(part, str) and part in fields else '<index>' if type(part) is int else '<field>'
+               for part in error.get('loc', ())[:12]]
+        kind = error.get('type')
+        result.append({'loc': loc, 'type': kind if kind in types else 'unknown'})
+    return result
+
+
 class VultrLLM:
-    def __init__(self, settings: Any, client: httpx.AsyncClient | None = None) -> None:
+    def __init__(self, settings: Any, client: httpx.AsyncClient | None = None,
+                 diagnostic_sink: Callable[[dict[str, Any]], None] | None = None) -> None:
         self.settings = settings
         self._client = client
+        self._diagnostic_sink = diagnostic_sink
         self._strategies: dict[str, str] = {}
+
+    def _diagnose(self, data: dict[str, Any]) -> None:
+        # Opt-in local consumer only; never put diagnostics in public errors or logs.
+        if self._diagnostic_sink is not None:
+            try:
+                self._diagnostic_sink(data)
+            except Exception:  # noqa: BLE001, S110 -- diagnostics cannot change inference behavior
+                pass
 
     async def chat(
         self, role: str, messages: list[dict[str, Any]],
@@ -210,10 +252,19 @@ class VultrLLM:
                             data = response.json()
                             if not isinstance(data, dict):
                                 raise TypeError("invalid response envelope")
-                            p, c, charged, estimated = _usage(data.get("usage"), reservation)
+                            usage = data.get("usage")
+                            p, c, charged, estimated = _usage(usage, reservation)
+                            details = usage.get('completion_tokens_details', {}) if isinstance(usage, dict) else {}
+                            reasoning = details.get('reasoning_tokens') if isinstance(details, dict) else None
+                            if type(reasoning) is not int or not 0 <= reasoning <= c:
+                                reasoning = None
                             prompt_tokens += p
                             completion_tokens += c
-                            raw = data["choices"][0]["message"]["content"]
+                            choice = data["choices"][0]
+                            raw = choice["message"]["content"]
+                            finish = choice.get("finish_reason")
+                            if finish not in ('stop', 'length', 'content_filter', 'tool_calls', 'function_call'):
+                                finish = 'other'
                             if not isinstance(raw, str):
                                 raise TypeError("non-text response")
                         except (ValueError, TypeError, KeyError, IndexError):
@@ -233,9 +284,19 @@ class VultrLLM:
                         _budget.settle(day, reservation, charged)
                         total_tokens += charged
                         estimated_tokens += estimated
+                    diagnostic = None
+                    if self._diagnostic_sink is not None:
+                        diagnostic = {'role': _safe_identifier(role, key), 'model': _safe_identifier(model, key),
+                                      'strategy': strategy, 'finish_reason': finish, 'response_length': len(raw),
+                                      'response_sha256': _sha(raw), 'repair': repaired,
+                                      'prompt_tokens': p, 'completion_tokens': c, 'reasoning_tokens': reasoning,
+                                      'charged_tokens': charged, 'estimated_tokens': estimated}
                     try:
                         value = response_model.model_validate_json(_extract_json(raw)) if response_model else raw
                     except (ValidationError, ValueError) as exc:
+                        if diagnostic is not None:
+                            self._diagnose({**diagnostic, 'valid': False,
+                                            'validation_errors': _validation_locations(exc, schema or {})})
                         if repaired:
                             raise LLMError("Inference output failed schema validation after repair") from None
                         repaired = True
@@ -245,6 +306,8 @@ class VultrLLM:
                             {"role": "user", "content": "Correct the JSON validation errors: " + error},
                         ]
                         break
+                    if diagnostic is not None:
+                        self._diagnose({**diagnostic, 'valid': True, 'validation_errors': []})
                     if response_model:
                         self._strategies[model] = strategy
                     return LLMResult(value=value, raw_text=raw, record=LLMCallRecord(

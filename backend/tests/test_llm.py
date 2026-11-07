@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import httpx
 import pytest
 from pod import llm
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 
 class Answer(BaseModel):
@@ -76,6 +76,59 @@ def test_schema_success_and_fenced_json():
     result = run_with(handler, lambda c: c.chat("auditor", [], Answer))
     assert result.value.number == 7
     assert result.record.strategy == "json_schema"
+
+
+def test_diagnostics_are_opt_in_bounded_and_hide_validation_inputs(caplog):
+    seen = []
+    secret = 'PRIVATE-DATA-EXAMPLE'
+    calls = []
+
+    def handler(_):
+        calls.append(1)
+        body = json.dumps({'number': secret})
+        return httpx.Response(200, json={'choices': [{'message': {'content': body}, 'finish_reason': 'length'}],
+                                        'usage': {'prompt_tokens': 3, 'completion_tokens': 2,
+                                                  'completion_tokens_details': {'reasoning_tokens': 2}}})
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            adapter = llm.VultrLLM(settings(), client, diagnostic_sink=seen.append)
+            with pytest.raises(llm.LLMError, match='after repair'):
+                await adapter.chat('auditor', [], Answer)
+
+    asyncio.run(run())
+    assert len(calls) == len(seen) == 2
+    assert all(x['finish_reason'] == 'length' and not x['valid'] and x['reasoning_tokens'] == 2 for x in seen)
+    assert seen[0]['validation_errors'] == [{'loc': ['number'], 'type': 'int_parsing'}]
+    assert [x['repair'] for x in seen] == [False, True]
+    assert secret not in json.dumps(seen) + caplog.text
+    assert 'test-secret' not in json.dumps(seen) + caplog.text
+    assert llm._budget.used == 10
+
+
+def test_diagnostic_sink_failure_does_not_change_result():
+    def sink(_):
+        raise RuntimeError('diagnostic failure')
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(lambda _: reply('{"number": 1}'))) as client:
+            return await llm.VultrLLM(settings(), client, diagnostic_sink=sink).chat('auditor', [], Answer)
+
+    assert asyncio.run(run()).value.number == 1
+    assert llm._budget.used == 5
+
+
+def test_diagnostic_location_masks_untrusted_fields_and_inputs():
+    class StrictAnswer(BaseModel):
+        model_config = {'extra': 'forbid'}
+        number: int
+
+    try:
+        StrictAnswer.model_validate({'number': 1, 'PRIVATE-DATA-EXAMPLE': 'test-secret'})
+    except ValidationError as exc:
+        result = llm._validation_locations(exc, StrictAnswer.model_json_schema())
+    assert result == [{'loc': ['<field>'], 'type': 'extra_forbidden'}]
+    assert 'PRIVATE-DATA-EXAMPLE' not in str(result) and 'test-secret' not in str(result)
 
 
 def test_repair_only_once():
