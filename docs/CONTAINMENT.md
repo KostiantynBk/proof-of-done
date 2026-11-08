@@ -2,6 +2,10 @@
 
 These observations are from the Proof of Done Vultr Ubuntu 24.04 VM on 2026-11-07, using Docker 29.9.3, gVisor `runsc` release-20261102.0, and service/sandbox UID:GID `1001:1001`. They are a limited demonstration, not a security certification or proof that defects are absent. Python audit-hook telemetry is **best-effort** and hostile code may bypass it; enforcement is provided by the configured runtime and host limits. The orchestrator belongs to the Docker group, which grants root-equivalent control of the host daemon, so this is not a multi-tenant security boundary for the orchestrator itself.
 
+## 2026-11-08 current-image follow-up
+
+The deployed sandbox tag later changed; on 8 November one independently reviewed bounded suite was run against exact image `sha256:e57243f7dac1425ad9fe0c844e03f74a0f5f15b253e177e0ccd47fcb10850697`, with no rebuild or retag in the test. It passed **2 tests** using 10 runsc sandboxes and a separate runc/bridge positive control; all 11 created IDs were absent in the recorded inventory **before** service restart. Assertions inspected the real image and sandbox configuration, network isolation versus a reachable-IP positive control, fake-canary telemetry, timeout, memory and nested mode-000 cleanup. Two PID checks observed `pids.max=128`, current reaching 128, and max events 0→1; runsc exited error/2, not guest EAGAIN. See the [exact current-image evidence pack](evidence/current-image-release/README.md) for the method and bounded limitations. This is separate from the 65 historical run receipts, which used image `sha256:0c6edc5075e36402d70571708f10d9c4d7558e7fadba82ac2f4144626d9144b9`; no image equivalence is claimed.
+
 ## Method
 
 The service was stopped before the opt-in Docker integration suite and restarted only after it exited and no labelled sandbox containers or workspaces remained. The suite was explicitly collected from `backend/tests`, not from the target demo project. With the environment prepared on this VM, the command was:

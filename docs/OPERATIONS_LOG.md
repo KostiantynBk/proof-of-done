@@ -59,9 +59,13 @@ Operational observations, not product-evaluation results. No containment or qual
 - T15 adds read-only completeness warnings for historical live views and future ordinary report exports, plus explicit candidate-failure/review and mutation-equivalence caveats. Independent checks: **281 backend passed, 4 skipped; 11 frontend passed; Ruff and build passed**. Replacement reviewer found no blocker/high in scoped code.
 - Acceptance split: T15 does **not** regenerate historical downloads. Preserve the original four artifacts. A separately reviewed public supplement and clear download/provenance wording must be delivered before pinning or treating the run as finished submission evidence. No export refresh, new audit or pin has occurred.
 
+## 2026-11-08 — disclosure release, current-image checks and recording
+
+- Reviewed product revision `fafd5b4` deployed to the existing VM. The original run's four export byte hashes and 358-event journal head remained unchanged. Navigator verified the run and pinned `55cef2ea9d72408c9d96e4e1f89811b2` as a metadata-only recorded demo.
+- Deployment re-tagged a different sandbox image. One separately reviewed bounded integration suite tested the **current** image `sha256:e57243f7dac1425ad9fe0c844e03f74a0f5f15b253e177e0ccd47fcb10850697`: 2 tests passed; 10 runsc sandboxes and one runc/bridge positive control, all 11 created IDs absent before pod restart. Two PID scenarios observed cgroup max events 0→1 at current/max 128 and runsc error/exit 2, not graceful guest refusal. [Exact current-image evidence](evidence/current-image-release/README.md) is separate from the historical 65 sandbox receipts, whose image was `sha256:0c6edc5075e36402d70571708f10d9c4d7558e7fadba82ac2f4144626d9144b9`.
+- Current index and referenced frontend assets matched the reviewed build; two unreferenced older static assets remained after tar overlay and were not removed. No historical export regeneration or new audit occurred.
+
 ## Current gates
 
-- Step B: server bootstrap, deployment, valid TLS and health verification — verified; low documentation follow-up fixed.
-- Step C: scoped actual gVisor containment tests and cleanup evidence — verified; no general security-certification claim.
-- Step D: tuned live model run, evaluation against the seeded target, approvals and pinned receipts — pending.
-- Steps E–F: evidence-backed submission assets, real captures, video and form — pending.
+- Steps B–D: deployment, bounded containment evidence, reviewed run and metadata-only pin — verified within the recorded limitations; no general security-certification claim.
+- Steps E–F: real capture materials and submission assets in progress. The user video and final form submission remain open gates.

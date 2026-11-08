@@ -1,0 +1,16 @@
+# Presentation claim and asset notes
+
+Slides and cover generated 8 November 2026 from editable [`make_assets.py`](make_assets.py); output [`proof-of-done-slides.pdf`](proof-of-done-slides.pdf) and [`proof-of-done-cover.png`](proof-of-done-cover.png). All embedded UI images are unchanged real captures documented in [`../img/README.md`](../img/README.md). Layout/shapes are original; no external logo or stock art. Built-in PDF Helvetica and local Arial used; no font files bundled. Screenshot timestamps reflect the browser's displayed local time.
+
+| Slide | Key claims | Source / qualification |
+|---|---|---|
+| 1 | Passing tests may not guard a requirement | Problem framing; [spec](../SPEC.md) and actual [home capture](../img/live-home-2026-11-08.jpg). |
+| 2 | Extract, deterministic quote/citation checking, targeted/blind edits, review | [Product spec](../SPEC.md), [run review](../results/tuned-run-review.md). Both sabotage passes use the saboteur role; no claim of independent models. |
+| 3 | Vultr VM, Serverless Inference, runsc, network none, root/caps/cleanup | [README architecture](../../README.md), [containment notes](../CONTAINMENT.md); image is historical baseline receipt, not current-image test. |
+| 4 | Model claimed 10 covered; 4 PROVEN/6 WEAK/2 UNTESTED, zero PROVEN rules, 4 skips/1 failure entry | [Saved postdecision summary](../evidence/55cef2ea9d72408c9d96e4e1f89811b2/postdecision-summary.json), [interpretation](../results/tuned-run-review.md). This is a small seeded run, not a benchmark. |
+| 5 | REQ-02/03 approved, four rejected; RULE-01 generated-test failure | [Original postdecision receipts](../evidence/55cef2ea9d72408c9d96e4e1f89811b2/receipts.json), [semantic review](../evidence/55cef2ea9d72408c9d96e4e1f89811b2/independent-review.md). Attribution: Craft Agent navigator (delegated review), not user-personal. |
+| 6 | 65 historical sandbox records destroyed; fake canary/DNS; separately 2 current-image tests, PID max event 0→1 and runsc error/2 | [Historical receipt evidence](../evidence/55cef2ea9d72408c9d96e4e1f89811b2/receipts.json), [current image pack](../evidence/current-image-release/README.md). Historical image `0c6edc…` and current `e57243…` differ; no equivalence claim. PID evidence is cgroup event observation, not graceful guest refusal. |
+| 7 | Equivalent/off-target mutations and inaccurate descriptions limit verdicts; no defect-absence or compliance proof | [Independent semantic review](../evidence/55cef2ea9d72408c9d96e4e1f89811b2/independent-review.md), [review supplement](../results/tuned-run-review.md). |
+| 8 | Live app and public repo; prior-work credit | [README](../../README.md), [prior work](../PRIOR_WORK.md); `RuleProof` is the author's earlier project; `SoloTrace` is third-party work by Shehar Bano. No code from either is claimed as reused. |
+
+**Video gate:** the historical receipt screenshot does not itself demonstrate a new attempt. A genuine continuous attempt→outcome→destroyed receipt must be captured separately after explicit authorization, labeled as a new playground action rather than the recorded audit. The final user video and form submission remain outstanding; do not infer confirmation from this PDF or cover.

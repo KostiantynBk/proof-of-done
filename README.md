@@ -49,11 +49,18 @@ The tuned demo run `55cef2ea9d72408c9d96e4e1f89811b2` recorded **4 PROVEN, 6 WEA
 all operations succeeded: four gaps were skipped and one component-failure entry was recorded.
 [Supplementary review and limitations](docs/results/tuned-run-review.md) ·
 [Preserved evidence and original exports](docs/evidence/55cef2ea9d72408c9d96e4e1f89811b2/README.md).
-The original downloads predate the disclosure update and are preserved snapshots, not refreshed
-reports; the separate supplement is not covered by their receipt digest. The run was reviewed by
+Open the pinned recorded demo from the home page. The original downloads predate the disclosure
+update and are preserved snapshots, not refreshed reports; the separate supplement is not covered
+by their receipt digest. The run was reviewed by
 Craft Agent navigator (delegated review), not personally by the user. A recorded survivor need not
 represent a real defect: mutations may be equivalent or off-target, and model descriptions can be wrong.
 The demo is seeded, not a benchmark, compliance certification or proof that defects are absent.
+
+Real screenshots captured 8 November 2026 from the deployed `fafd5b4` UI: [recorded-demo link](docs/img/live-home-recorded-2026-11-08.jpg), [completeness panel](docs/img/live-run-completeness-2026-11-08.jpg), [verdict board](docs/img/live-run-verdicts-2026-11-08.jpg), [approved REQ-02](docs/img/live-req02-approved-2026-11-08.jpg), [approved REQ-03](docs/img/live-req03-approved-2026-11-08.jpg), [rejected RULE-01](docs/img/live-rule01-rejected-2026-11-08.jpg), and [historical containment receipt](docs/img/live-historical-containment-2026-11-08.jpg). These stills do not constitute a new live audit or a video of an attempt.
+
+The sandbox image serving future workloads was separately checked after deployment. Its immutable
+ID differs from the image in this historical audit; the bounded current-image results and exact
+artifacts are [documented separately](docs/evidence/current-image-release/README.md).
 
 ## The containment moment
 
