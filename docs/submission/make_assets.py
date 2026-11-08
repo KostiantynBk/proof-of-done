@@ -46,7 +46,7 @@ slides = [
      'live-run-verdicts-2026-11-08.jpg', 'Original exports remain unchanged; see supplement'),
     ('08  /  EXPLORE', 'Evidence over assurance.',
      ['Live: 108-61-195-77.sslip.io', 'GitHub: KostiantynBk/proof-of-done',
-      'Fresh work inspired by RuleProof and SoloTrace.', 'Review the preserved run and its limitations.'],
+      'Review the preserved run and its limitations.'],
      'live-home-recorded-2026-11-08.jpg', 'Vultr Agent Rush · Blast Radius Zero'),
 ]
 
